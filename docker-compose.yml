@@ -46,7 +46,7 @@ services:
     redis:
         image: 'redis:alpine'
         ports:
-            - '${FORWARD_REDIS_PORT:-6379}:6379'
+            - '${FORWARD_REDIS_PORT:-6279}:6279'
         volumes:
             - 'sailredis:/data'
         networks:
