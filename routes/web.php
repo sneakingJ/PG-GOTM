@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Laravel\Socialite\Facades\Socialite;
+use App\Http\Controllers\DiscordController;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,20 +20,6 @@ Route::get('/', function () {
     return view('main', ['authId' => $userId]);
 });
 
-Route::get('/discord-auth/login', function () {
-    return Socialite::driver('discord')->redirect();
-});
-
-Route::get('/discord-auth/logout', function () {
-    session(['authId' => null]);
-
-    return redirect('/');
-});
-
-Route::get('/discord-auth/callback', function () {
-    $user = Socialite::driver('discord')->user();
-
-    session(['authId' => $user->getId()]);
-
-    return redirect('/');
-});
+Route::get('/discord-auth/login', [DiscordController::class, 'login'])->name('login');
+Route::get('/discord-auth/logout', [DiscordController::class, 'logout'])->middleware('auth.discord');
+Route::get('/discord-auth/callback', [DiscordController::class, 'authCallback']);
