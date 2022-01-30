@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Laravel\Socialite\Facades\Socialite;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,5 +15,25 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    $userId = session('authId');
+
+    return view('main', ['authId' => $userId]);
+});
+
+Route::get('/discord-auth/login', function () {
+    return Socialite::driver('discord')->redirect();
+});
+
+Route::get('/discord-auth/logout', function () {
+    session(['authId' => null]);
+
+    return redirect('/');
+});
+
+Route::get('/discord-auth/callback', function () {
+    $user = Socialite::driver('discord')->user();
+
+    session(['authId' => $user->getId()]);
+
+    return redirect('/');
 });
