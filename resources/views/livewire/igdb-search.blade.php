@@ -22,7 +22,7 @@
         @foreach($games as $game)
             <div class="level mb-0 mr-4 is-clickable is-hoverable" wire:loading.remove>
                 <div class="level-left p-4">
-                    <div class="level-item">
+                    <div class="level-item level-item-cover">
                         <img src="{{ $game['cover'] }}" class="igdb-cover">
                     </div>
                     <div class="level-item">

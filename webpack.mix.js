@@ -17,6 +17,10 @@ mix.js('resources/js/app.js', 'public/js')
         'node_modules/@fortawesome/fontawesome-free/webfonts',
         'public/webfonts'
     )
+    .copy(
+        'resources/images',
+        'public/images'
+    )
     .postCss('resources/css/app.css', 'public/css', [
         //
     ]);
