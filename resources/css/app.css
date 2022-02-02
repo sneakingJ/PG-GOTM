@@ -1,0 +1,17 @@
+.igdb-results {
+    max-height: 600px;
+    overflow-y: scroll;
+}
+
+.igdb-results .level {
+    border-bottom: 1px solid #aeb6bf;
+}
+
+.igdb-box img.igdb-cover {
+    width: 90px;
+    height: 90px;
+}
+
+.igdb-box .is-hoverable:hover {
+    background-color: #566573;
+}

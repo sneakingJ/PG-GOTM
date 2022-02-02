@@ -14,12 +14,12 @@ class IgdbSearch extends Component
     /**
      * @var string
      */
-    public $searchstring = "";
+    public string $searchstring = "";
 
     /**
      * @var array
      */
-    public $games = array();
+    public array $games = array();
 
     /**
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Contracts\Foundation\Application
