@@ -31,7 +31,7 @@ class IgdbSearch extends Component
         $gameList = array();
 
         if (Str::length($this->searchstring) > 3) {
-            $results = Game::fuzzySearch('name', $this->searchstring, false)->with(['cover'])->all();
+            $results = Game::whereLike('name', $this->searchstring, false)->with(['cover'])->all();
 
             $results->each(function ($item, $key) use (&$gameList) {
                 $game = array();

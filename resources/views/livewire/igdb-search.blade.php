@@ -1,5 +1,5 @@
 <div>
-    Search for game: <input wire:model="searchstring" type="text"> <br><br>
+    Search for game: <input wire:model.debounce.600ms="searchstring" type="text"> <br><br>
 
     @foreach($games as $game)
         <div>
