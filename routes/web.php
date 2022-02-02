@@ -15,11 +15,11 @@ use App\Http\Controllers\DiscordController;
 */
 
 Route::get('/', function () {
-    $userId = session('authId');
+    $user = session('auth');
 
-    return view('main', ['authId' => $userId]);
+    return view('main', ['user' => $user]);
 });
 
 Route::get('/discord-auth/login', [DiscordController::class, 'login'])->name('login');
 Route::get('/discord-auth/logout', [DiscordController::class, 'logout'])->middleware('auth.discord');
-Route::get('/discord-auth/callback', [DiscordController::class, 'authCallback']);
+Route::get('/discord-auth/callback', [DiscordController::class, 'callback']);

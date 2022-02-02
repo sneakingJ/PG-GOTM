@@ -1,14 +1,22 @@
-<html>
+<html lang="en">
 <head>
     <title>PG GOTM</title>
+    @livewireStyles
 </head>
 <body>
-    Hello, {{ $authId }}
-    <br><br>
-    @if (is_null($authId))
-        <a href="{{ url('/discord-auth/login') }}">Login</a>
+    Hello,
+
+    @if (is_null($user))
+        <br><br>
+        <a href="{{ url('/discord-auth/login') }}">Auth</a>
     @else
-        <a href="{{ url('/discord-auth/logout') }}">Logout</a>
+        {{ $user->name }}
+        <br><br>
+        <a href="{{ url('/discord-auth/logout') }}">De-Auth</a>
     @endif
+    <br><br>
+    <livewire:igdb-search />
+
+    @livewireScripts
 </body>
 </html>

@@ -16,9 +16,9 @@ class DiscordAuthenticated
      */
     public function handle(Request $request, Closure $next)
     {
-        $userId = $request->session()->get('authId');
+        $user = $request->session()->get('auth');
 
-        if (empty($userId)) {
+        if (empty($user)) {
             return redirect()->route('login');
         }
 

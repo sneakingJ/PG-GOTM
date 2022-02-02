@@ -13,7 +13,7 @@ class DiscordController extends Controller
      */
     public function login(): RedirectResponse
     {
-        return Socialite::driver('discord')->redirect();
+        return Socialite::driver('discord')->setScopes(['identify'])->redirect();
     }
 
     /**
@@ -22,7 +22,7 @@ class DiscordController extends Controller
      */
     public function logout(Request $request): RedirectResponse
     {
-        $request->session()->forget('authId');
+        $request->session()->forget('auth');
 
         return redirect('/');
     }
@@ -31,11 +31,15 @@ class DiscordController extends Controller
      * @param Request $request
      * @return RedirectResponse
      */
-    public function authCallback(Request $request): RedirectResponse
+    public function callback(Request $request): RedirectResponse
     {
-        $user = Socialite::driver('discord')->user();
+        try {
+            $user = Socialite::driver('discord')->user();
+        } catch (\GuzzleHttp\Exception\ClientException $exception) {
+            return redirect('/');
+        }
 
-        $request->session()->put('authId', $user->getId());
+        $request->session()->put('auth', $user);
 
         return redirect('/');
     }

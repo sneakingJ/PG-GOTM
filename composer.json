@@ -11,6 +11,8 @@
         "laravel/framework": "^8.65",
         "laravel/sanctum": "^2.11",
         "laravel/tinker": "^2.5",
+        "livewire/livewire": "^2.10",
+        "marcreichel/igdb-laravel": "^3.5",
         "socialiteproviders/discord": "^4.1"
     },
     "require-dev": {
