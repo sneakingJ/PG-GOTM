@@ -3,8 +3,8 @@
 namespace App\Http\Livewire;
 
 use Livewire\Component;
-use Illuminate\Support\Str;
 use MarcReichel\IGDBLaravel\Models\Game;
+use Illuminate\Support\Str;
 
 /**
  *
@@ -22,11 +22,17 @@ class IgdbSearch extends Component
     public array $games = array();
 
     /**
+     * @var bool
+     */
+    public bool $noResults = false;
+
+    /**
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Contracts\Foundation\Application
      * @throws \MarcReichel\IGDBLaravel\Exceptions\MissingEndpointException
      */
     public function render(): \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Contracts\Foundation\Application
     {
+        $this->noResults = false;
         $this->games = array();
         $gameList = array();
 
@@ -35,10 +41,10 @@ class IgdbSearch extends Component
 
             $results->each(function ($item, $key) use (&$gameList) {
                 $game = array();
-                $game['name'] = $item->name;
+                $game['name'] = $item->name . ' (' . Str::substr($item->first_release_date, 0, 4) . ')';
 
                 if (empty($item->cover)) {
-                    $game['cover'] = "";
+                    $game['cover'] = '';
                 } else {
                     $game['cover'] = $item->cover['url'];
                 }
@@ -46,7 +52,11 @@ class IgdbSearch extends Component
                 $gameList[] = $game;
             });
 
-            usort($gameList, array($this, "sortByRelevance"));
+            if (empty($gameList)) {
+                $this->noResults = true;
+            }
+
+            usort($gameList, array($this, 'sortByRelevance'));
             $this->games = array_slice($gameList, 0, 10, true);
         }
 
@@ -54,11 +64,11 @@ class IgdbSearch extends Component
     }
 
     /**
-     * @param $x
-     * @param $y
+     * @param array $x
+     * @param array $y
      * @return int
      */
-    private function sortByRelevance($x, $y): int
+    private function sortByRelevance(array $x, array $y): int
     {
         $levX = levenshtein($this->searchstring, $x['name']);
         $levY = levenshtein($this->searchstring, $y['name']);

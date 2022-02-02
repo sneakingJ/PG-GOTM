@@ -8,10 +8,17 @@
         </p>
     </div>
 
-    <div class="igdb-results">
-        <div wire:loading.block wire:target="searchstring" class="mt-4">
-            <progress class="progress is-small is-info" max="100">50%</progress>
+    <div wire:loading.block wire:target="searchstring" class="mt-4">
+        <progress class="progress is-small is-info" max="100">50%</progress>
+    </div>
+
+    @if($noResults)
+        <div class="mt-4 ml-4" wire:loading.remove>
+            <strong>No results found</strong>
         </div>
+    @endif
+
+    <div class="igdb-results">
         @foreach($games as $game)
             <div class="level mb-0 mr-4 is-clickable is-hoverable" wire:loading.remove>
                 <div class="level-left p-4">
