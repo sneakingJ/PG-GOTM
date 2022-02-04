@@ -1879,16 +1879,16 @@
         },
         {
             "name": "marcreichel/igdb-laravel",
-            "version": "3.6.0",
+            "version": "3.6.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/marcreichel/igdb-laravel.git",
-                "reference": "dbe0510c5f3666ca3e1a41f5a59c2642251cd938"
+                "reference": "1684caeee553558de00bbc6116fe3c3f556de056"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/marcreichel/igdb-laravel/zipball/dbe0510c5f3666ca3e1a41f5a59c2642251cd938",
-                "reference": "dbe0510c5f3666ca3e1a41f5a59c2642251cd938",
+                "url": "https://api.github.com/repos/marcreichel/igdb-laravel/zipball/1684caeee553558de00bbc6116fe3c3f556de056",
+                "reference": "1684caeee553558de00bbc6116fe3c3f556de056",
                 "shasum": ""
             },
             "require": {
@@ -1951,7 +1951,7 @@
             ],
             "support": {
                 "issues": "https://github.com/marcreichel/igdb-laravel/issues",
-                "source": "https://github.com/marcreichel/igdb-laravel/tree/3.6.0"
+                "source": "https://github.com/marcreichel/igdb-laravel/tree/3.6.1"
             },
             "funding": [
                 {
@@ -1959,7 +1959,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2022-01-31T17:00:51+00:00"
+            "time": "2022-02-04T11:05:04+00:00"
         },
         {
             "name": "monolog/monolog",
@@ -7023,12 +7023,12 @@
             },
             "type": "library",
             "autoload": {
-                "psr-4": {
-                    "DeepCopy\\": "src/DeepCopy/"
-                },
                 "files": [
                     "src/DeepCopy/deep_copy.php"
-                ]
+                ],
+                "psr-4": {
+                    "DeepCopy\\": "src/DeepCopy/"
+                }
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
