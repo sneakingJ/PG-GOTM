@@ -14,7 +14,12 @@ class IgdbSearch extends Component
     /**
      * @var string
      */
-    public string $searchstring = "";
+    public string $searchName = "";
+
+    /**
+     * @var string
+     */
+    public string $searchYear = "";
 
     /**
      * @var array
@@ -36,8 +41,12 @@ class IgdbSearch extends Component
         $this->games = array();
         $gameList = array();
 
-        if (Str::length($this->searchstring) > 3) {
-            $results = Game::whereLike('name', $this->searchstring, false)->with(['cover'])->all();
+        if (Str::length($this->searchName) >= 3) {
+            $searchQuery = Game::whereLike('name', $this->searchName, false);
+            if (!empty($this->searchYear)) {
+                $searchQuery->whereLike('release_dates.human', $this->searchYear, false);
+            }
+            $results = $searchQuery->with(['cover'])->all();
 
             $results->each(function ($item, $key) use (&$gameList) {
                 $game = array();
@@ -57,7 +66,7 @@ class IgdbSearch extends Component
             }
 
             usort($gameList, array($this, 'sortByRelevance'));
-            $this->games = array_slice($gameList, 0, 10, true);
+            $this->games = array_slice($gameList, 0, 20, true);
         }
 
         return view('livewire.igdb-search');
@@ -70,8 +79,8 @@ class IgdbSearch extends Component
      */
     private function sortByRelevance(array $x, array $y): int
     {
-        $levX = levenshtein($this->searchstring, $x['name']);
-        $levY = levenshtein($this->searchstring, $y['name']);
+        $levX = levenshtein($this->searchName, $x['name']);
+        $levY = levenshtein($this->searchName, $y['name']);
 
         return $levX > $levY ? 1 : -1;
     }

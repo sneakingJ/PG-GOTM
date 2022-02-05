@@ -14,11 +14,8 @@ use App\Http\Controllers\DiscordController;
 |
 */
 
-Route::get('/', function () {
-    $user = session('auth');
-
-    return view('main', ['user' => $user]);
-});
+Route::get('/', MainController::class)->name('main');
+Route::get('/nomination', NominationController::class)->name('nomination')->middleware('auth.discord');
 
 Route::get('/discord-auth/login', [DiscordController::class, 'login'])->name('login');
 Route::get('/discord-auth/logout', [DiscordController::class, 'logout'])->middleware('auth.discord');

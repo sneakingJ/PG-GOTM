@@ -17,6 +17,7 @@ class CreateThemesTable extends Migration
             $table->id();
             $table->foreignId('theme_category_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->string('name');
+            $table->text('description')->nullable();
             $table->timestamps();
         });
     }

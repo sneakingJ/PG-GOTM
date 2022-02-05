@@ -19,6 +19,7 @@ class CreateNominationsTable extends Migration
             $table->string('game_id', 20);
             $table->boolean('short')->nullable();
             $table->string('game_name');
+            $table->string('game_year')->nullable();
             $table->string('game_cover')->nullable();
             $table->string('game_url')->nullable();
             $table->text('pitch')->nullable();

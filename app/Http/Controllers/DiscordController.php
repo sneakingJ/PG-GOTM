@@ -41,6 +41,6 @@ class DiscordController extends Controller
 
         $request->session()->put('auth', $user);
 
-        return redirect('/');
+        return redirect($request->session()->get('url.intended'));
     }
 }
