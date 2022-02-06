@@ -19,6 +19,8 @@ class DiscordAuthenticated
         $user = $request->session()->get('auth');
 
         if (empty($user)) {
+            $request->session()->put('url.intended', $request->url());
+
             return redirect()->route('login');
         }
 

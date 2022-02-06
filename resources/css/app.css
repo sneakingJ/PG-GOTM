@@ -1,20 +1,22 @@
-.igdb-results {
-    max-height: 605px;
+.game-list {
+    max-height: 800px;
     overflow-y: scroll;
 }
-
-.igdb-results .level {
+.game-list-search {
+    max-height: 605px;
+}
+.game-list .level {
     border-bottom: 1px solid #aeb6bf;
 }
 
-.igdb-box img.igdb-cover {
+.igdb-cover {
+    background-image: url('../images/nocover.png');
     width: 90px;
     height: 90px;
 }
-.level-item-cover {
-    height: 90px;
+.igdb-cover img {
     width: 90px;
-    background-image: url('../images/nocover.png');
+    height: 90px;
 }
 
 .igdb-box .is-hoverable:hover {

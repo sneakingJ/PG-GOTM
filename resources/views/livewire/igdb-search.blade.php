@@ -20,7 +20,7 @@
         </div>
     </div>
 
-    <div wire:loading.block wire:target="searchName" class="mt-4">
+    <div wire:loading.block wire:target="searchName, searchYear" class="mt-4">
         <progress class="progress is-small is-info" max="100">50%</progress>
     </div>
 
@@ -30,18 +30,23 @@
         </div>
     @endif
 
-    <div class="igdb-results">
+    <div class="game-list game-list-search" wire:loading.remove>
         @foreach($games as $game)
-            <div class="level mb-0 mr-4 is-clickable is-hoverable" wire:loading.remove>
+            <div class="level mb-0 mr-4 is-clickable is-hoverable"
+                 wire:click="$emitTo('nominate-modal', 'activateModal', '{{ $game['id'] }}', '{{ $game['name'] }}', '{{ $game['cover'] }}')">
                 <div class="level-left p-4">
-                    <div class="level-item level-item-cover">
-                        <img src="{{ $game['cover'] }}" class="igdb-cover">
+                    <div class="level-item igdb-cover">
+                        <img src="{{ $game['cover'] }}">
                     </div>
                     <div class="level-item">
-                        <strong>{{ $game['name'] }}</strong>
+                        <strong class="igdb-name">{{ $game['name'] }} ({{ $game['year'] }})</strong>
                     </div>
                 </div>
             </div>
         @endforeach
     </div>
+
+    <livewire:nominate-message/>
+
+    <livewire:nominate-modal/>
 </div>

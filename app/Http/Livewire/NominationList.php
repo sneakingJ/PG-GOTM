@@ -11,16 +11,16 @@ use App\Models\Nomination;
 class NominationList extends Component
 {
     /**
-     * @var \Illuminate\Database\Eloquent\Collection|static[]
+     * @var \Illuminate\Database\Eloquent\Collection
      */
-    public array|\Illuminate\Database\Eloquent\Collection $nominations;
+    public \Illuminate\Database\Eloquent\Collection $nominations;
 
     /**
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+     * @return \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\Foundation\Application
      */
     public function render(): \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\Foundation\Application
     {
-        $this->nominations = Nomination::all();
+        $this->nominations = Nomination::orderBy('created_at', 'desc')->get();
 
         return view('livewire.nomination-list');
     }

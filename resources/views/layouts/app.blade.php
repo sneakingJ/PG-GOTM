@@ -21,8 +21,8 @@
                         <span>Main</span>
                     </a>
                 </li>
-                <li class="{{ (Route::currentRouteName() == 'nomination') ? 'is-active' : '' }}">
-                    <a href="{{ url('/nomination') }}">
+                <li class="{{ (Route::currentRouteName() == 'nominate') ? 'is-active' : '' }}">
+                    <a href="{{ url('/nominate') }}">
                         <span class="icon is-small"><i class="fas fa-vote-yea" aria-hidden="true"></i></span>
                         <span>Nominate / Vote</span>
                     </a>
@@ -40,7 +40,6 @@
 
     </div>
 </section>
-
 @livewireScripts
 </body>
 </html>

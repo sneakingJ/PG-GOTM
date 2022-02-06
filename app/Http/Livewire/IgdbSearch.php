@@ -33,7 +33,7 @@ class IgdbSearch extends Component
 
     /**
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Contracts\Foundation\Application
-     * @throws \MarcReichel\IGDBLaravel\Exceptions\MissingEndpointException
+     * @throws \MarcReichel\IGDBLaravel\Exceptions\MissingEndpointException|\JsonException
      */
     public function render(): \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Contracts\Foundation\Application
     {
@@ -42,21 +42,19 @@ class IgdbSearch extends Component
         $gameList = array();
 
         if (Str::length($this->searchName) >= 3) {
-            $searchQuery = Game::whereLike('name', $this->searchName, false);
+            $searchQuery = Game::whereLike('name', trim($this->searchName), false);
             if (!empty($this->searchYear)) {
-                $searchQuery->whereLike('release_dates.human', $this->searchYear, false);
+                $searchQuery->whereLike('release_dates.human', trim($this->searchYear), false);
             }
             $results = $searchQuery->with(['cover'])->all();
 
             $results->each(function ($item, $key) use (&$gameList) {
                 $game = array();
-                $game['name'] = $item->name . ' (' . Str::substr($item->first_release_date, 0, 4) . ')';
-
-                if (empty($item->cover)) {
-                    $game['cover'] = '';
-                } else {
-                    $game['cover'] = $item->cover['url'];
-                }
+                $game['name'] = $item->name;
+                $game['year'] = Str::substr($item->first_release_date, 0, 4);
+                $game['id'] = $item->id;
+                $game['url'] = $item->url;
+                empty($item->cover) ? $game['cover'] = '' : $game['cover'] = $item->cover['url'];
 
                 $gameList[] = $game;
             });
@@ -70,6 +68,14 @@ class IgdbSearch extends Component
         }
 
         return view('livewire.igdb-search');
+    }
+
+    /**
+     * @return void
+     */
+    public function boot()
+    {
+        $this->emitTo('nominate-message', 'removeAll');
     }
 
     /**
