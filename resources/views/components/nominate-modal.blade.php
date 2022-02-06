@@ -16,7 +16,7 @@
                     </div>
                     <div class="column is-four-fifths">
                         <div class="control">
-                            <textarea class="textarea" wire:model="gamePitch" placeholder="Pitch us your nomination! These are optional but will help the Jury out quite a bit. All pitches will be shown publicly." maxlength="1000">{{ $gamePitch }}</textarea>
+                            <textarea class="textarea" wire:model.defer="gamePitch" placeholder="Pitch us your nomination! These are optional but will help the Jury out quite a bit. All pitches will be shown publicly." maxlength="1000">{{ $gamePitch }}</textarea>
                         </div>
                         <div class="control mt-4">
                             <label class="radio">
