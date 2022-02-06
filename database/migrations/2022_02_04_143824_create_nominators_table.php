@@ -17,9 +17,10 @@ class CreateNominatorsTable extends Migration
             $table->id();
             $table->foreignId('month_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->string('discord_id', 20);
+            $table->boolean('short')->nullable();
             $table->timestamps();
 
-            $table->unique(['month_id', 'discord_id']);
+            $table->unique(['month_id', 'discord_id', 'short']);
         });
     }
 
