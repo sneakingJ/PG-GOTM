@@ -18,7 +18,7 @@ class CreateMonthsTable extends Migration
             $table->foreignId('theme_id')->nullable()->constrained()->cascadeOnUpdate()->nullOnDelete();
             $table->smallInteger('year');
             $table->tinyInteger('month');
-            $table->boolean('active')->default(false);
+            $table->enum('status', ['ready', 'nomination', 'jury', 'voting', 'playing', 'over'])->default('ready');
             $table->timestamps();
 
             $table->unique(['year', 'month']);

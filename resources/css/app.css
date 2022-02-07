@@ -1,12 +1,18 @@
 .game-list {
-    max-height: 800px;
+    max-height: 605px;
+    min-height: 185px;
     overflow-y: scroll;
 }
 .game-list-search {
     max-height: 605px;
+    overflow-y: scroll;
 }
-.game-list .level {
-    border-bottom: 1px solid #aeb6bf;
+.game-list-search .media-content .subtitle {
+    position: absolute;
+    bottom: 0;
+}
+.game-list-search .card:first-child {
+    margin-top: 1.25rem;
 }
 
 .igdb-cover {

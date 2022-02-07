@@ -30,16 +30,22 @@
         </div>
     @endif
 
-    <div class="game-list game-list-search" wire:loading.remove>
+    <div class="game-list-search" wire:loading.remove>
         @foreach($games as $game)
-            <div class="level mb-0 mr-4 is-clickable is-hoverable"
-                 wire:click="$emitTo('nominate-modal', 'activateModal', '{{ $game['id'] }}', '{{ $game['name'] }}', '{{ $game['cover'] }}')">
-                <div class="level-left p-4">
-                    <div class="level-item igdb-cover">
-                        <img src="{{ $game['cover'] }}">
-                    </div>
-                    <div class="level-item">
-                        <strong class="igdb-name">{{ $game['name'] }} ({{ $game['year'] }})</strong>
+            <div class="card mb-4 is-clickable is-hoverable" wire:click="$emitTo('nominate-modal', 'activateModal', '{{ $game['id'] }}', '{{ $game['name'] }}', '{{ $game['cover'] }}')">
+                <div class="card-content">
+                    <div class="media">
+                        <div class="media-left">
+                            <figure class="image igdb-cover">
+                                <img src="{{ $game['cover']  }}">
+                            </figure>
+                        </div>
+                        <div class="media-content">
+                            <p class="title is-4">{{ $game['name'] }} ({{ $game['year'] }})</p>
+                            <p class="subtitle is-size-5 mb-5">
+                                <a href="{{ $game['url'] }}" target="_blank" class="is-size-6" wire:click.stop=""><span class="icon is-small"><i class="fas fa-external-link-alt" aria-hidden="true"></i></span> <span>IGDB</span></a>
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
