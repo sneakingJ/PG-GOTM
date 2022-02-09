@@ -39,31 +39,17 @@ class IgdbSearch extends Component
     {
         $this->noResults = false;
         $this->games = array();
-        $gameList = array();
 
-        if (Str::length($this->searchName) >= 3) {
-            $searchQuery = Game::whereLike('name', trim($this->searchName), false);
+        $searchTerm = trim(Str::limit($this->searchName, 50));
+        if (Str::length($searchTerm) >= 3) {
+            $searchQuery = Game::whereLike('name', $searchTerm, false);
+            $searchQuery->orWhereLike('alternative_names.name', $searchTerm, false);
             if (!empty($this->searchYear)) {
                 $searchQuery->whereLike('release_dates.human', trim($this->searchYear), false);
             }
-            $results = $searchQuery->with(['cover'])->all();
 
-            $results->each(function ($item, $key) use (&$gameList) {
-                $game = array();
-                $game['name'] = $item->name;
-                $game['year'] = Str::substr($item->first_release_date, 0, 4);
-                $game['id'] = $item->id;
-                $game['url'] = $item->url;
-                empty($item->cover) ? $game['cover'] = '' : $game['cover'] = $item->cover['url'];
+            $gameList = $this->processResult($searchQuery->with(['cover'])->all());
 
-                $gameList[] = $game;
-            });
-
-            if (empty($gameList)) {
-                $this->noResults = true;
-            }
-
-            usort($gameList, array($this, 'sortByRelevance'));
             $this->games = array_slice($gameList, 0, 20, true);
         }
 
@@ -76,6 +62,34 @@ class IgdbSearch extends Component
     public function boot()
     {
         $this->emitTo('nominate-message', 'removeAll');
+    }
+
+    /**
+     * @param \Illuminate\Support\Collection $igdbResults
+     * @return array
+     */
+    private function processResult(\Illuminate\Support\Collection $igdbResults): array
+    {
+        $gameList = array();
+
+        $igdbResults->each(function ($item, $key) use (&$gameList) {
+            $game = array();
+            $game['name'] = $item->name;
+            $game['year'] = Str::substr($item->first_release_date, 0, 4);
+            $game['id'] = $item->id;
+            $game['url'] = $item->url;
+            empty($item->cover) ? $game['cover'] = '' : $game['cover'] = $item->cover['url'];
+
+            $gameList[] = $game;
+        });
+
+        if (empty($gameList)) {
+            $this->noResults = true;
+        }
+
+        usort($gameList, array($this, 'sortByRelevance'));
+
+        return $gameList;
     }
 
     /**

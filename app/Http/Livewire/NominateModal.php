@@ -86,7 +86,7 @@ class NominateModal extends Component
             $this->gamePitch = '';
         }
         $this->gameId = $id;
-        $this->gameName = $name;
+        $this->gameName = html_entity_decode($name);
         $this->gameCover = $cover;
         $this->active = true;
     }

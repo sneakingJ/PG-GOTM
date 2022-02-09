@@ -32,7 +32,7 @@
 
     <div class="game-list-search" wire:loading.remove>
         @foreach($games as $game)
-            <div class="card mb-4 is-clickable is-hoverable" wire:click="$emitTo('nominate-modal', 'activateModal', '{{ $game['id'] }}', '{{ $game['name'] }}', '{{ $game['cover'] }}')">
+            <div class="card mb-4 is-clickable is-hoverable" wire:click="$emitTo('nominate-modal', 'activateModal', '{{ $game['id'] }}', '{{ htmlentities($game['name']) }}', '{{ $game['cover'] }}')">
                 <div class="card-content">
                     <div class="media">
                         <div class="media-left">
