@@ -7,10 +7,6 @@
     max-height: 605px;
     overflow-y: scroll;
 }
-.game-list-search .media-content .subtitle {
-    position: absolute;
-    bottom: 0;
-}
 .game-list-search .card:first-child {
     margin-top: 1.25rem;
 }
@@ -27,4 +23,33 @@
 
 .igdb-box .is-hoverable:hover {
     background-color: #566573;
+}
+
+.platformlist {
+    min-height: 45px;
+}
+.platform-image {
+    height: 45px;
+    width: 70px;
+    white-space: nowrap;
+    text-align: center;
+    margin: 1em 0;
+    float: left;
+}
+.platform-image .helper {
+    display: inline-block;
+    height: 100%;
+    vertical-align: middle;
+}
+.platform-image img {
+    -webkit-transform: scale(0.7); /* Saf3.1+, Chrome */
+    -moz-transform: scale(0.7); /* FF3.5+ */
+    -ms-transform: scale(0.7); /* IE9 */
+    -o-transform: scale(0.7); /* Opera 10.5+ */
+    transform: scale(0.7);
+    /* IE6–IE9 */
+    filter: progid:DXImageTransform.Microsoft.Matrix(M11=0.9999619230641713, M12=-0.008726535498373935, M21=0.008726535498373935, M22=0.9999619230641713,SizingMethod='auto expand');
+    vertical-align: middle;
+    max-height: 45px;
+    max-width: 70px;
 }

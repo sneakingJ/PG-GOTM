@@ -5,6 +5,7 @@ namespace App\Http\Livewire;
 use Livewire\Component;
 use MarcReichel\IGDBLaravel\Models\Game;
 use Illuminate\Support\Str;
+use App\Models\IgdbPlatform;
 
 /**
  *
@@ -78,7 +79,10 @@ class IgdbSearch extends Component
             $game['year'] = Str::substr($item->first_release_date, 0, 4);
             $game['id'] = $item->id;
             $game['url'] = $item->url;
-            empty($item->cover) ? $game['cover'] = '' : $game['cover'] = $item->cover['url'];
+            $game['cover'] = empty($item->cover) ? '' : $item->cover['url'];
+
+            $platforms = empty($item->platforms) ? array() : $item->platforms;
+            $game['platforms'] = IgdbPlatform::whereIn('igdb_id', $platforms)->whereNotNull('logo')->get();
 
             $gameList[] = $game;
         });

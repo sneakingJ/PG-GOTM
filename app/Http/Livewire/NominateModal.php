@@ -121,6 +121,7 @@ class NominateModal extends Component
         $nomination->game_year = Str::substr($game->first_release_date, 0, 4);
         $nomination->game_cover = empty($game->cover['url']) ? '' : $game->cover['url'];
         $nomination->game_url = $game->url;
+        $nomination->game_platform_ids = implode(',', $game->platforms);
         $nomination->pitch = Str::limit($this->gamePitch, 1000, ' (...)');
         $nomination->short = $this->gameShort;
         $nomination->save();

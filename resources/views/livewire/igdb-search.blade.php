@@ -1,9 +1,11 @@
 <div class="box igdb-box">
+    <livewire:nominate-message/>
+    
     <div class="igdb-search">
         <div class="columns">
             <div class="column is-four-fifths">
                 <p class="control has-icons-left">
-                    <input wire:model.debounce.400ms="searchName" type="text" class="input" placeholder="Search for game">
+                    <input wire:model.debounce.400ms="searchName" type="text" class="input" placeholder="Search for game" autofocus>
                     <span class="icon is-left">
                         <i class="fas fa-search" aria-hidden="true"></i>
                     </span>
@@ -36,13 +38,20 @@
                 <div class="card-content">
                     <div class="media">
                         <div class="media-left">
-                            <figure class="image igdb-cover">
+                            <figure class="image mt-4 igdb-cover">
                                 <img src="{{ $game['cover']  }}">
                             </figure>
                         </div>
                         <div class="media-content">
-                            <p class="title is-4">{{ $game['name'] }} ({{ $game['year'] }})</p>
-                            <p class="subtitle is-size-5 mb-5">
+                            <p class="title is-4 mb-0">{{ $game['name'] }} ({{ $game['year'] }})</p>
+                            <div class="platformlist is-clearfix">
+                                @foreach($game['platforms'] as $platform)
+                                    <div class="platform-image">
+                                        <span class="helper"></span><img src="{{ $platform->logo }}" title="{{ $platform->name }}">
+                                    </div>
+                                @endforeach
+                            </div>
+                            <p class="subtitle is-size-5">
                                 <a href="{{ $game['url'] }}" target="_blank" class="is-size-6" wire:click.stop=""><span class="icon is-small"><i class="fas fa-external-link-alt" aria-hidden="true"></i></span> <span>IGDB</span></a>
                             </p>
                         </div>
@@ -51,8 +60,6 @@
             </div>
         @endforeach
     </div>
-
-    <livewire:nominate-message/>
 
     <livewire:nominate-modal/>
 </div>
