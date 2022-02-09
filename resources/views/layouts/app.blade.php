@@ -14,26 +14,7 @@
 <section class="section">
     <div class="container">
         <div class="tabs is-centered is-boxed is-medium">
-            <ul>
-                <li class="{{ (Route::currentRouteName() == 'main') ? 'is-active' : '' }}">
-                    <a href="{{ url('/') }}">
-                        <span class="icon is-small"><i class="fas fa-gamepad" aria-hidden="true"></i></span>
-                        <span>Main</span>
-                    </a>
-                </li>
-                <li class="{{ (Route::currentRouteName() == 'nominate') ? 'is-active' : '' }}">
-                    <a href="{{ url('/nominate') }}">
-                        <span class="icon is-small"><i class="fas fa-vote-yea" aria-hidden="true"></i></span>
-                        <span>Nominate / Vote</span>
-                    </a>
-                </li>
-                <li class="{{ (Route::currentRouteName() == 'jury') ? 'is-active' : '' }}">
-                    <a>
-                        <span class="icon is-small"><i class="fas fa-users-cog" aria-hidden="true"></i></span>
-                        <span>Jury</span>
-                    </a>
-                </li>
-            </ul>
+            @livewire('navigation')
         </div>
 
         {{ $slot }}

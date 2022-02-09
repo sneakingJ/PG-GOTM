@@ -24,8 +24,6 @@ class NominateMessage extends Component
      */
     public string $errorMessage = '';
 
-
-
     /**
      * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
      */
