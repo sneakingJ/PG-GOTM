@@ -27,7 +27,7 @@ class NominateModal extends Component
     /**
      * @var int
      */
-    public int $monthId = 1;
+    public int $monthId = 2;
 
     /**
      * @var bool
@@ -105,17 +105,53 @@ class NominateModal extends Component
      */
     public function nominate()
     {
-        // TODO: Also check if game already was GOTM
-        if (Nomination::where('month_id', $this->monthId)->where('game_id', $this->gameId)->exists()) {
+        $user = session('auth');
+
+        $errorMessage = $this->verify($user['id']);
+        if (!is_null($errorMessage)) {
             $this->disableModal();
-            $this->emitTo('nominate-message', 'showError', 'This game has already been nominated.');
+            $this->emitTo('nominate-message', 'showError', $errorMessage);
             return;
         }
 
+        $this->createNomination($user['id']);
+
+        $this->disableModal();
+
+        $this->emitTo('nominate-message', 'showSubmitted');
+    }
+
+    /**
+     * @param string $userId
+     * @return string|null
+     * TODO: Also check if game already was GOTM
+     */
+    private function verify(string $userId): ?string
+    {
+        if (Nomination::where('month_id', $this->monthId)->where('game_id', $this->gameId)->exists()) {
+            return 'This game has already been nominated.';
+        }
+
+        if (Nomination::where('month_id', $this->monthId)->where('discord_id', $userId)->where('short', $this->gameShort)->exists()) {
+            $type = $this->gameShort ? 'short' : 'long';
+            return 'You already nominated a ' . $type . ' game.';
+        }
+
+        return null;
+    }
+
+    /**
+     * @param $userId
+     * @return void
+     * @throws \MarcReichel\IGDBLaravel\Exceptions\MissingEndpointException
+     */
+    private function createNomination($userId)
+    {
         $game = Game::where('id', (int)$this->gameId)->with(['cover'])->first();
 
         $nomination = new Nomination();
         $nomination->month_id = $this->monthId;
+        $nomination->discord_id = $userId;
         $nomination->game_id = $game->id;
         $nomination->game_name = $game->name;
         $nomination->game_year = Str::substr($game->first_release_date, 0, 4);
@@ -125,9 +161,5 @@ class NominateModal extends Component
         $nomination->pitch = Str::limit($this->gamePitch, 1000, ' (...)');
         $nomination->short = $this->gameShort;
         $nomination->save();
-
-        $this->disableModal();
-
-        $this->emitTo('nominate-message', 'showSubmitted');
     }
 }

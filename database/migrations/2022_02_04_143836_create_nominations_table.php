@@ -17,6 +17,7 @@ class CreateNominationsTable extends Migration
             $table->id();
             $table->foreignId('month_id')->nullable()->constrained()->cascadeOnUpdate()->nullOnDelete();
             $table->string('game_id', 20);
+            $table->string('discord_id', 20);
             $table->boolean('short')->nullable();
             $table->string('game_name');
             $table->string('game_year')->nullable();
@@ -28,6 +29,7 @@ class CreateNominationsTable extends Migration
             $table->timestamps();
 
             $table->unique(['month_id', 'game_id']);
+            $table->unique(['month_id', 'discord_id', 'short']);
         });
     }
 
