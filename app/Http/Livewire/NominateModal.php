@@ -6,6 +6,7 @@ use Livewire\Component;
 use Illuminate\Support\Str;
 use MarcReichel\IGDBLaravel\Models\Game;
 use App\Models\Nomination;
+use App\Models\Winner;
 
 /**
  *
@@ -124,17 +125,20 @@ class NominateModal extends Component
     /**
      * @param string $userId
      * @return string|null
-     * TODO: Also check if game already was GOTM
      */
     private function verify(string $userId): ?string
     {
-        if (Nomination::where('month_id', $this->monthId)->where('game_id', $this->gameId)->exists()) {
-            return 'This game has already been nominated.';
-        }
-
         if (Nomination::where('month_id', $this->monthId)->where('discord_id', $userId)->where('short', $this->gameShort)->exists()) {
             $type = $this->gameShort ? 'short' : 'long';
-            return 'You already nominated a ' . $type . ' game.';
+            return 'You already nominated a ' . $type . ' game this month.';
+        }
+
+        if (Nomination::where('month_id', $this->monthId)->where('game_id', $this->gameId)->exists()) {
+            return 'This game has already been nominated for this month.';
+        }
+
+        if (Winner::where('game_id', $this->gameId)->exists()) {
+            return 'This game already was GOTM.';
         }
 
         return null;
