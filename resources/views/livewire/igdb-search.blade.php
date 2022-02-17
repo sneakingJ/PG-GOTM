@@ -28,7 +28,7 @@
 
     @if($noResults)
         <div class="mt-4 ml-4" wire:loading.remove>
-            <strong>No results found</strong>
+            <strong>No results found. Maybe you have a typo? If not, please check <a href="https://www.igdb.com/" target="_blank">IGDB</a> manually and insert the complete title of the game page.</strong>
         </div>
     @endif
 
