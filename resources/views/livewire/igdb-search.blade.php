@@ -1,6 +1,6 @@
 <div class="box igdb-box">
     <livewire:nominate-message/>
-    
+
     <div class="igdb-search">
         <div class="columns">
             <div class="column is-four-fifths">
@@ -62,4 +62,5 @@
     </div>
 
     <livewire:nominate-modal/>
+    <livewire:hltb-modal/>
 </div>

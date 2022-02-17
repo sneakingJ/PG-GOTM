@@ -18,16 +18,17 @@
                         <div class="control">
                             <textarea class="textarea" wire:model.defer="gamePitch" placeholder="Pitch us your nomination! These are optional but will help the Jury out quite a bit. All pitches will be shown publicly." maxlength="1000">{{ $gamePitch }}</textarea>
                         </div>
-                        <div class="control mt-4">
+                        <div class="control is-pulled-left mt-4">
                             <label class="radio">
                                 <input type="radio" name="short" value="1" wire:model="gameShort">
-                                Short Game
+                                Short Game (<= 12h HLTB Main Story)
                             </label><br>
                             <label class="radio">
                                 <input type="radio" name="short" value="0" wire:model="gameShort">
-                                Long Game
+                                Long Game (> 12h HLTB Main Story)
                             </label>
                         </div>
+                        <button type="button" class="button is-pulled-right mt-5" wire:click="$emitTo('hltb-modal', 'activateModal', '{{ $gameName }}')" onclick="buttonLoad(this);">Get HLTB times</button>
                     </div>
                 </div>
             </section>

@@ -29,7 +29,6 @@ class CreateNominationsTable extends Migration
             $table->timestamps();
 
             $table->unique(['month_id', 'game_id']);
-            $table->unique(['month_id', 'discord_id', 'short']);
         });
     }
 

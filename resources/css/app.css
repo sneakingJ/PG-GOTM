@@ -15,10 +15,17 @@
     background-image: url('../images/nocover.png');
     width: 90px;
     height: 90px;
+    overflow: visible;
 }
 .igdb-cover img {
     width: 90px;
     height: 90px;
+}
+.hltb-modal .igdb-cover img {
+    height: 135px;
+}
+.hltb-modal .media-content .title {
+    min-height: 50px;
 }
 
 .igdb-box .is-hoverable:hover {
