@@ -34,7 +34,10 @@ class IgdbSearch extends Component
 
     /**
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Contracts\Foundation\Application
-     * @throws \MarcReichel\IGDBLaravel\Exceptions\MissingEndpointException|\JsonException
+     * @throws \JsonException
+     * @throws \MarcReichel\IGDBLaravel\Exceptions\InvalidParamsException
+     * @throws \MarcReichel\IGDBLaravel\Exceptions\MissingEndpointException
+     * @throws \ReflectionException
      */
     public function render(): \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Contracts\Foundation\Application
     {
@@ -43,10 +46,12 @@ class IgdbSearch extends Component
 
         $searchTerm = trim(Str::limit($this->searchName, 50));
         if (Str::length($searchTerm) >= 3) {
-            $searchQuery = Game::whereLike('name', $searchTerm, false);
-            $searchQuery->orWhereLike('alternative_names.name', $searchTerm, false);
-            if (!empty($this->searchYear)) {
-                $searchQuery->whereLike('release_dates.human', trim($this->searchYear), false);
+            $searchQuery = Game::where(function ($query) use ($searchTerm) {
+                $query->whereLike('name', $searchTerm, false)->orWhereLike('alternative_names.name', $searchTerm, false);
+            });
+
+            if (!empty($this->searchYear) && strlen($this->searchYear) == 4) {
+                $searchQuery->whereYear('first_release_date', trim($this->searchYear));
             }
 
             $gameList = $this->processResult($searchQuery->with(['cover'])->all());
