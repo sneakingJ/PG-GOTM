@@ -26,7 +26,7 @@ class Navigation extends Component
      */
     public function render(): \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\Foundation\Application
     {
-        $this->nominationExists = Month::where('status', MonthStatus::NOMINATION)->exists();
+        $this->nominationExists = Month::where('status', MonthStatus::NOMINATING)->exists();
         $this->votingExists = Month::where('status', MonthStatus::VOTING)->exists();
 
         return view('livewire.navigation');
