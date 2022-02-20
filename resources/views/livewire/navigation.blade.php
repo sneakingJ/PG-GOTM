@@ -11,6 +11,8 @@
             <span>
                 @if($nominationExists)
                     Nominate
+                @elseif($juryExists)
+                    Jury at work
                 @elseif($votingExists)
                     Vote
                 @else

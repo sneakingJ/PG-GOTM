@@ -19,6 +19,11 @@ class Navigation extends Component
     /**
      * @var bool
      */
+    public bool $juryExists = false;
+
+    /**
+     * @var bool
+     */
     public bool $votingExists = false;
 
     /**
@@ -27,6 +32,7 @@ class Navigation extends Component
     public function render(): \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\Foundation\Application
     {
         $this->nominationExists = Month::where('status', MonthStatus::NOMINATION)->exists();
+        $this->juryExists = Month::where('status', MonthStatus::JURY)->exists();
         $this->votingExists = Month::where('status', MonthStatus::VOTING)->exists();
 
         return view('livewire.navigation');

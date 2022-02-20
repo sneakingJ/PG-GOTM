@@ -16,7 +16,7 @@ This whole project is open source and the code can be inspected by everyone on G
 ## Tech Stack
 - PHP 8.1
 - Mysql 8.0
-- Laravel
+- Laravel 8
 - Livewire
 - Bulma CSS
 

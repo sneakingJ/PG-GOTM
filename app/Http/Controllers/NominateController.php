@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Livewire\Component;
+use App\Lib\MonthStatus;
+use App\Models\Month;
 
 /**
  *
@@ -10,7 +12,17 @@ use Livewire\Component;
 class NominateController extends Component
 {
     /**
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|void
+     */
+    public function mount()
+    {
+        if (!Month::where('status', MonthStatus::NOMINATION)->exists()) {
+            return redirect(route('main'));
+        }
+    }
+
+    /**
+     * @return \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\Foundation\Application
      */
     public function render(): \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\Foundation\Application
     {
