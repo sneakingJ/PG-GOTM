@@ -16,7 +16,7 @@ class NominateController extends Component
      */
     public function mount()
     {
-        if (!Month::where('status', MonthStatus::NOMINATION)->exists()) {
+        if (!Month::where('status', MonthStatus::NOMINATING)->exists()) {
             return redirect(route('main'));
         }
     }
