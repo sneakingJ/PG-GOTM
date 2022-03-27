@@ -38,25 +38,24 @@
                 <div id="long-sankey" class="sankey-container"></div>
                 @empty($longResult)
                     No votes yet!
-                @else
-                    <script type="text/javascript">
-                        function drawChartLong() {
-                            var data = new google.visualization.DataTable();
-                            data.addColumn('string', 'From');
-                            data.addColumn('string', 'To');
-                            data.addColumn('number', 'Votes');
-                            data.addRows([
-                                @foreach($longResult as $result)
-                                    ['{{ $result[0] }}', '{{ $result[1] }}', {{ $result[2] }}],
-                                @endforeach
-                            ]);
-
-                            // Instantiates and draws our chart, passing in some options.
-                            var chart = new google.visualization.Sankey(document.getElementById('long-sankey'));
-                            chart.draw(data, options);
-                        }
-                    </script>
                 @endempty
+                <script type="text/javascript">
+                    function drawChartLong() {
+                        var data = new google.visualization.DataTable();
+                        data.addColumn('string', 'From');
+                        data.addColumn('string', 'To');
+                        data.addColumn('number', 'Votes');
+                        data.addRows([
+                            @foreach($longResult as $result)
+                                ['{{ $result[0] }}', '{{ $result[1] }}', {{ $result[2] }}],
+                            @endforeach
+                        ]);
+
+                        // Instantiates and draws our chart, passing in some options.
+                        var chart = new google.visualization.Sankey(document.getElementById('long-sankey'));
+                        chart.draw(data, options);
+                    }
+                </script>
             </div>
             <div class="column is-narrow is-hidden-mobile">
             </div>
@@ -65,25 +64,24 @@
                 <div id="short-sankey" class="sankey-container"></div>
                 @empty($shortResult)
                     No votes yet!
-                @else
-                    <script type="text/javascript">
-                        function drawChartShort() {
-                            var data = new google.visualization.DataTable();
-                            data.addColumn('string', 'From');
-                            data.addColumn('string', 'To');
-                            data.addColumn('number', 'Votes');
-                            data.addRows([
-                                @foreach($shortResult as $result)
-                                    ['{{ $result[0] }}', '{{ $result[1] }}', {{ $result[2] }}],
-                                @endforeach
-                            ]);
-
-                            // Instantiates and draws our chart, passing in some options.
-                            var chart = new google.visualization.Sankey(document.getElementById('short-sankey'));
-                            chart.draw(data, options);
-                        }
-                    </script>
                 @endempty
+                <script type="text/javascript">
+                    function drawChartShort() {
+                        var data = new google.visualization.DataTable();
+                        data.addColumn('string', 'From');
+                        data.addColumn('string', 'To');
+                        data.addColumn('number', 'Votes');
+                        data.addRows([
+                            @foreach($shortResult as $result)
+                                ['{{ $result[0] }}', '{{ $result[1] }}', {{ $result[2] }}],
+                            @endforeach
+                        ]);
+
+                        // Instantiates and draws our chart, passing in some options.
+                        var chart = new google.visualization.Sankey(document.getElementById('short-sankey'));
+                        chart.draw(data, options);
+                    }
+                </script>
             </div>
         </div>
     </div>

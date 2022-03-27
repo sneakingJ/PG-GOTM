@@ -134,6 +134,7 @@ class VotingList extends Component
             return $nominations;
         }
 
+        $this->currentOrder[(int)$short] = array($vote->rank_1, $vote->rank_2, $vote->rank_3);
         return new Collection([Nomination::find($vote->rank_1), Nomination::find($vote->rank_2), Nomination::find($vote->rank_3)]);
     }
 }
