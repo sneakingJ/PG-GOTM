@@ -145,11 +145,11 @@ class NominateModal extends Component
     }
 
     /**
-     * @param $userId
+     * @param string $userId
      * @return void
      * @throws \MarcReichel\IGDBLaravel\Exceptions\MissingEndpointException
      */
-    private function createNomination($userId)
+    private function createNomination(string $userId)
     {
         $game = Game::where('id', (int)$this->gameId)->with(['cover'])->first();
 
@@ -161,7 +161,7 @@ class NominateModal extends Component
         $nomination->game_year = Str::substr($game->first_release_date, 0, 4);
         $nomination->game_cover = empty($game->cover['url']) ? '' : $game->cover['url'];
         $nomination->game_url = $game->url;
-        $nomination->game_platform_ids = implode(',', $game->platforms);
+        $nomination->game_platform_ids = is_array($game->platforms) ? implode(',', $game->platforms) : $game->platforms;
         $nomination->pitch = Str::limit($this->gamePitch, 1000, ' (...)');
         $nomination->short = $this->gameShort;
         $nomination->save();

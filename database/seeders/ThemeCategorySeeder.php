@@ -35,6 +35,10 @@ class ThemeCategorySeeder extends Seeder
             [
                 'id' => 4,
                 'name' => 'Annuals'
+            ],
+            [
+                'id' => 5,
+                'name' => 'Various'
             ]
         );
 

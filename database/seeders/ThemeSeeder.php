@@ -284,6 +284,11 @@ class ThemeSeeder extends Seeder
                 'id' => 47,
                 'theme_category_id' => 4,
                 'name' => 'Second Chance'
+            ],
+            [
+                'id' => 48,
+                'theme_category_id' => 5,
+                'name' => 'Female/Non-Binary Protagonist'
             ]
         );
 

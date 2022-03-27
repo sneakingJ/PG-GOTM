@@ -8,7 +8,7 @@ namespace App\Lib;
 enum MonthStatus: String
 {
     case READY = 'ready';
-    case NOMINATION = 'nomination';
+    case NOMINATING = 'nominating';
     case JURY = 'jury';
     case VOTING = 'voting';
     case PLAYING = 'playing';

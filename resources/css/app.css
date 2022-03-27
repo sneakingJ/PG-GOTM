@@ -1,3 +1,7 @@
+.pitch {
+    font-size: 18px;
+}
+
 .game-list {
     max-height: 605px;
     min-height: 185px;
@@ -59,4 +63,36 @@
     vertical-align: middle;
     max-height: 45px;
     max-width: 70px;
+}
+
+.voting-number {
+    font-size: 100px;
+    line-height: 100px;
+    padding: 22px 0;
+    margin-bottom: 15px;
+}
+.voting .card {
+    cursor: pointer;
+}
+.voting .card .title {
+    max-height: 25px;
+}
+.voting .pitch .fullpitch {
+    display: none;
+    max-width: 400px;
+    background-color: #1f2424;
+    color: #fff;
+    border-radius: 6px;
+    padding: 5px 15px;
+    position: absolute;
+    z-index: 1;
+    top: 3px;
+    left: 62px;
+}
+.voting .pitch.clicked .fullpitch {
+    display: block;
+}
+
+.sankey-container {
+    pointer-events: none;
 }
