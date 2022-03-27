@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Nomination;
 use Livewire\Component;
 
 /**
@@ -15,8 +14,6 @@ class VotingController extends Component
      */
     public function render(): \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\Foundation\Application
     {
-        $games = Nomination::where('jury_selected', true)->get();
-
-        return view('voting', ['games' => $games]);
+        return view('voting');
     }
 }

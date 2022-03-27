@@ -5,7 +5,7 @@
             <span>Main</span>
         </a>
     </li>
-    <li class="{{ (Route::currentRouteName() == 'nominate') ? 'is-active' : '' }}">
+    <li class="{{ (Route::currentRouteName() == 'nominate' || Route::currentRouteName() == 'voting') ? 'is-active' : '' }}">
         <a href="@if($nominationExists){{ route('nominate') }}@elseif($votingExists){{ route('voting') }}@else#@endif">
             <span class="icon is-small"><i class="fas fa-vote-yea" aria-hidden="true"></i></span>
             <span>

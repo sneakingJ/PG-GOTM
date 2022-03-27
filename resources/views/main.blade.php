@@ -1,3 +1,9 @@
 <div class="block">
-    <livewire:nomination-list/>
+    @if($nominationExists)
+        <livewire:nomination-list/>
+    @elseif($votingExists)
+        <livewire:voting-result/>
+    @else
+        Play the games!
+    @endif
 </div>

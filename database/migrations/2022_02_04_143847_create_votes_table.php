@@ -15,12 +15,13 @@ class CreateVotesTable extends Migration
     {
         Schema::create('votes', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('nomination_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('month_id')->nullable()->constrained()->cascadeOnUpdate()->nullOnDelete();
             $table->string('discord_id', 20);
-            $table->tinyInteger('priority');
+            $table->boolean('short')->nullable();
+            $table->foreignId('rank_1')->constrained('nominations')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('rank_2')->constrained('nominations')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('rank_3')->constrained('nominations')->cascadeOnUpdate()->cascadeOnDelete();
             $table->timestamps();
-
-            $table->unique(['nomination_id', 'discord_id']);
         });
     }
 
