@@ -13,7 +13,7 @@
                     @if (\Illuminate\Support\Str::length($nomination->pitch) > 50)
                         <i class="fas fa-sort-down"></i><span class="fullpitch"><i class="fas fa-sort-up"></i> {{ \Illuminate\Support\Str::limit($nomination->pitch, 680, ' (...)') }}</span>
                     @endif
-                </span><br><br>
+                </span><br>
                 <a href="{{ $nomination->game_url }}" target="_blank" class="is-size-6"><span class="icon is-small"><i class="fas fa-external-link-alt" aria-hidden="true"></i></span> <span>IGDB</span></a>
                 </p>
             </div>
