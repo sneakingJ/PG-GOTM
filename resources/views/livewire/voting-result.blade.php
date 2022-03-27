@@ -37,7 +37,7 @@
                 <h2 class="title is-3">Long Games</h2>
                 <div id="long-sankey" class="sankey-container"></div>
                 @empty($longResult)
-                    TIE
+                    No votes yet!
                 @else
                     <script type="text/javascript">
                         function drawChartLong() {
@@ -64,7 +64,7 @@
                 <h2 class="title is-3">Short Games</h2>
                 <div id="short-sankey" class="sankey-container"></div>
                 @empty($shortResult)
-                    TIE
+                    No votes yet!
                 @else
                     <script type="text/javascript">
                         function drawChartShort() {

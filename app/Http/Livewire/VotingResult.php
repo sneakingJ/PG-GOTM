@@ -48,6 +48,10 @@ class VotingResult extends Component
         $votes = Vote::where('month_id', $monthId)->where('short', $short)->get();
         $totalAmountVotes = $votes->count();
 
+        if ($totalAmountVotes === 0) {
+            return array();
+        }
+
         $voteCount = array();
         foreach ($nominations as $nomination) {
             $voteCount[$nomination->id] = Vote::where('rank_1', $nomination->id)->count();
