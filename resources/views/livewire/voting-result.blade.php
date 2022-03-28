@@ -47,7 +47,7 @@
                         data.addColumn('number', 'Votes');
                         data.addRows([
                             @foreach($longResult as $result)
-                                ['{{ $result[0] }}', '{{ $result[1] }}', {{ $result[2] }}],
+                                ['{!! addslashes($result[0]) !!}', '{!! addslashes($result[1]) !!}', {{ $result[2] }}],
                             @endforeach
                         ]);
 
@@ -73,7 +73,7 @@
                         data.addColumn('number', 'Votes');
                         data.addRows([
                             @foreach($shortResult as $result)
-                                ['{{ $result[0] }}', '{{ $result[1] }}', {{ $result[2] }}],
+                                ['{!! addslashes($result[0]) !!}', '{!! addslashes($result[1]) !!}', {{ $result[2] }}],
                             @endforeach
                         ]);
 
