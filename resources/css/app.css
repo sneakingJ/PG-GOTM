@@ -74,21 +74,6 @@
 .voting .card {
     cursor: pointer;
 }
-.voting .pitch .fullpitch {
-    display: none;
-    max-width: 400px;
-    background-color: #1f2424;
-    color: #fff;
-    border-radius: 6px;
-    padding: 5px 15px;
-    position: absolute;
-    z-index: 1;
-    top: 3px;
-    left: 62px;
-}
-.voting .pitch.clicked .fullpitch {
-    display: block;
-}
 
 .sankey-container {
     pointer-events: none;
