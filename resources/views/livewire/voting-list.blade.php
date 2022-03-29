@@ -1,7 +1,8 @@
 <div class="voting">
     <div class="columns is-centered">
-        <div class="column is-narrow">
+        <div class="column is-narrow has-text-centered">
             <h1 class="title is-2">Drag and Drop the games to rank them</h1>
+            <p>Please only vote for games you actually want to play next month :)</p>
         </div>
     </div>
 
