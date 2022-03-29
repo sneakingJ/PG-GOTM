@@ -129,7 +129,7 @@ class VotingList extends Component
         }
 
         if (empty($vote)) {
-            $nominations = Nomination::where('month_id', $monthId)->where('jury_selected', true)->where('short', $short)->get();
+            $nominations = Nomination::where('month_id', $monthId)->where('jury_selected', true)->where('short', $short)->inRandomOrder()->get();
             $this->currentOrder[(int)$short] = $nominations->pluck('id');
             return $nominations;
         }

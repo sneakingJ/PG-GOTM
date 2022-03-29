@@ -32,7 +32,7 @@ class VotingResult extends Component
         $monthId = Month::where('status', MonthStatus::VOTING)->first()->id;
 
         $this->longResult = $this->prepareChartData($monthId, false);
-        $this->shortResult = $this->prepareChartData($monthId,true);
+        $this->shortResult = $this->prepareChartData($monthId,false);
 
         return view('livewire.voting-result');
     }
@@ -41,6 +41,7 @@ class VotingResult extends Component
      * @param $monthId
      * @param $short
      * @return array
+     * Can remove $short..
      */
     private function prepareChartData($monthId, $short): array
     {
