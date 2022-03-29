@@ -35,16 +35,17 @@
         </div>
         <div class="columns">
             <div class="column">
-                <button class="button" type="button" wire:click="$emitTo('voting-list', 'saveVote', 'long')">Save</button>
+                <button class="button" type="button" wire:click="$emitTo('voting-list', 'saveVote', 'long')">Save Long</button>
             </div>
             <div class="column is-narrow has-text-centered">
                 <label class="checkbox"><input type="checkbox" wire:model="saveOnDrop"><br>Save on Drop</label>
             </div>
             <div class="column">
-                <button class="button is-pulled-right" type="button" wire:click="$emitTo('voting-list', 'saveVote', 'short')">Save</button>
+                <button class="button is-pulled-right" type="button" wire:click="$emitTo('voting-list', 'saveVote', 'short')">Save Short</button>
             </div>
         </div>
     </div>
+
     <div class="modal @if($pitchModalActive) is-active @endif">
         <div class="modal-background"></div>
         <div class="modal-card">
