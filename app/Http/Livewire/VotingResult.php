@@ -32,7 +32,7 @@ class VotingResult extends Component
         $monthId = Month::where('status', MonthStatus::VOTING)->first()->id;
 
         $this->longResult = $this->prepareChartData($monthId, false);
-        $this->shortResult = $this->prepareChartData($monthId,false);
+        $this->shortResult = $this->prepareChartData($monthId,true);
 
         return view('livewire.voting-result');
     }
@@ -78,10 +78,10 @@ class VotingResult extends Component
             foreach ($nominations as $fromNomination) {
                 $amountVotes = ($voteCount[$fromNomination->id] > 0) ? $voteCount[$fromNomination->id] : 0.1;
 
-                if ($short) {
+                /*if ($short) {
                     $returnData[] = [$winner->game_name . ' (' . $totalAmountVotes . ') ', $fromNomination->game_name . ' (' . floor($amountVotes) . ')', $amountVotes];
                     continue;
-                }
+                }*/
 
                 $returnData[] = [$fromNomination->game_name . ' (' . floor($amountVotes) . ')', $winner->game_name . ' (' . $totalAmountVotes . ') ', $amountVotes];
             }
@@ -99,11 +99,11 @@ class VotingResult extends Component
             $amountGain = Vote::where('rank_1', $loserId)->where('rank_2', $winner->id)->count();
             $amountVotesTo[$winner->id] = $amountVotesFrom + $amountGain;
 
-            if ($short) {
+            /*if ($short) {
                 $returnData[] = [$winner->game_name . ' (' . $amountVotesTo[$winner->id] . ') ', $loser->game_name . ' (' . $voteCount[$loserId] . ')', $amountGain];
                 $returnData[] = [$winner->game_name . ' (' . $amountVotesTo[$winner->id] . ') ', $winner->game_name . ' (' . $amountVotesFrom . ')', $amountVotesFrom];
                 continue;
-            }
+            }*/
 
             $returnData[] = [$loser->game_name . ' (' . $voteCount[$loserId] . ')', $winner->game_name . ' (' . $amountVotesTo[$winner->id] . ') ', $amountGain];
             $returnData[] = [$winner->game_name . ' (' . $amountVotesFrom . ')', $winner->game_name . ' (' . $amountVotesTo[$winner->id] . ') ', $amountVotesFrom];
@@ -112,10 +112,10 @@ class VotingResult extends Component
         $ultimateWinnerKey = array_search(max($amountVotesTo), $amountVotesTo);
         $ultimateWinner = $nominations->find($ultimateWinnerKey);
         foreach ($winners as $winner) {
-            if ($short) {
+            /*if ($short) {
                 $returnData[] = [$ultimateWinner->game_name . ' (' . $totalAmountVotes . ')  ', $winner->game_name . ' (' . $amountVotesTo[$winner->id] . ') ', $amountVotesTo[$winner->id]];
                 continue;
-            }
+            }*/
 
             $returnData[] = [$winner->game_name . ' (' . $amountVotesTo[$winner->id] . ') ', $ultimateWinner->game_name . ' (' . $totalAmountVotes . ')  ', $amountVotesTo[$winner->id]];
         }

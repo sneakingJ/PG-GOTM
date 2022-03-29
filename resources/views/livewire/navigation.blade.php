@@ -24,7 +24,7 @@
     <li class="{{ (Route::currentRouteName() == 'jury') ? 'is-active' : '' }}">
         <a href="{{ route('jury') }}">
             <span class="icon is-small"><i class="fas fa-users-cog" aria-hidden="true"></i></span>
-            <span>Jury</span>
+            <span>Jury Members</span>
         </a>
     </li>
 </ul>
