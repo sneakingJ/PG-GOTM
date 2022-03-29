@@ -70,10 +70,11 @@ class VotingResult extends Component
             );
         }
 
+        $firstRoundWinnerKey = array_search(max($voteCount), $voteCount);
+
         // One game has the majority of votes
         if ($totalAmountVotes / max($voteCount) <= 2) {
-            $winnerId = array_search(max($voteCount), $voteCount);
-            $winner = $nominations->find($winnerId);
+            $winner = $nominations->find($firstRoundWinnerKey);
 
             foreach ($nominations as $fromNomination) {
                 $amountVotes = ($voteCount[$fromNomination->id] > 0) ? $voteCount[$fromNomination->id] : 0.1;
@@ -109,7 +110,11 @@ class VotingResult extends Component
             $returnData[] = [$winner->game_name . ' (' . $amountVotesFrom . ')', $winner->game_name . ' (' . $amountVotesTo[$winner->id] . ') ', $amountVotesFrom];
         }
 
-        $ultimateWinnerKey = array_search(max($amountVotesTo), $amountVotesTo);
+        if ($amountVotesTo[$winners->first()->id] === $amountVotesTo[$winners->last()->id]) { // Tie in second round
+            $ultimateWinnerKey = $firstRoundWinnerKey;
+        } else {
+            $ultimateWinnerKey = array_search(max($amountVotesTo), $amountVotesTo);
+        }
         $ultimateWinner = $nominations->find($ultimateWinnerKey);
         foreach ($winners as $winner) {
             /*if ($short) {
