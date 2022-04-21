@@ -15,7 +15,7 @@ class CreatePitchesTable extends Migration
     {
         Schema::create('pitches', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('nomination_id')->nullable()->constrained()->cascadeOnUpdate()->nullOnDelete();
+            $table->foreignId('nomination_id')->nullable()->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->string('discord_id', 20);
             $table->text('pitch')->nullable();
             $table->timestamps();
