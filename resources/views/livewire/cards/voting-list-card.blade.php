@@ -9,13 +9,20 @@
             <div class="media-content">
                 <p class="title is-4">{{ $nomination->game_name }}</p>
                 <p class="subtitle is-size-5 is-relative">
-                <span class="pitch" wire:click="$emitTo('voting-list', 'activateModal', '{{ preg_replace('/[\r\n]+/', '<br />', htmlentities($nomination->pitch)) }}', '{{ htmlentities($nomination->game_name) }}', '{{ $nomination->game_cover }}')">
-                    {{ \Illuminate\Support\Str::limit($nomination->pitch, 50, '... ') }}
-                    @if (\Illuminate\Support\Str::length($nomination->pitch) > 50)
-                        <i class="fas fa-sort-down"></i>
+                    @php
+                        $firstPitch = $nomination->pitches()->first()
+                    @endphp
+                    @if(!empty($firstPitch))
+                        <span class="pitch" wire:click="$emitTo('nomination-list', 'activateModal', '{{ preg_replace('/[\r\n]+/', '<br />', htmlentities($firstPitch->pitch)) }}', '{{ htmlentities($nomination->game_name) }}', '{{ $nomination->game_cover }}')">
+                            {{ \Illuminate\Support\Str::limit($firstPitch->pitch, 50, '... ') }}
+                            @if (\Illuminate\Support\Str::length($firstPitch->pitch) > 50)
+                                <i class="fas fa-sort-down"></i>
+                            @endif
+                        </span><br><br>
+                    @else
+                        <span></span><br><br>
                     @endif
-                </span><br>
-                <a href="{{ $nomination->game_url }}" target="_blank" class="is-size-6"><span class="icon is-small"><i class="fas fa-external-link-alt" aria-hidden="true"></i></span> <span>IGDB</span></a>
+                    <a href="{{ $nomination->game_url }}" target="_blank" class="is-size-6"><span class="icon is-small"><i class="fas fa-external-link-alt" aria-hidden="true"></i></span> <span>IGDB</span></a>
                 </p>
             </div>
         </div>
