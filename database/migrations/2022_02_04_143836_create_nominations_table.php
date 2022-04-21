@@ -24,7 +24,6 @@ class CreateNominationsTable extends Migration
             $table->string('game_cover')->nullable();
             $table->string('game_url')->nullable();
             $table->string('game_platform_ids')->nullable();
-            $table->text('pitch')->nullable();
             $table->boolean('jury_selected')->default(false);
             $table->timestamps();
 

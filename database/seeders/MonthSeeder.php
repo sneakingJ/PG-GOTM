@@ -321,6 +321,13 @@ class MonthSeeder extends Seeder
                 'month' => 3,
                 'status' => 'over'
             ],
+            [
+                'id' => 44,
+                'theme_id' => 48,
+                'year' => 2022,
+                'month' => 4,
+                'status' => 'over'
+            ],
         );
 
         foreach ($months as $month) {

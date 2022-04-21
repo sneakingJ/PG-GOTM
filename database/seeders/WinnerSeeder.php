@@ -106,7 +106,9 @@ class WinnerSeeder extends Seeder
             ['id' => '26472', 'short' => false, 'month_id' => 42], // Disco Elysium
             ['id' => '14587', 'short' => true, 'month_id' => 42], // Oxenfree
             ['id' => '1271', 'short' => false, 'month_id' => 43], // Ōkami
-            ['id' => '3856', 'short' => true, 'month_id' => 43] // Chibi-Robo!
+            ['id' => '3856', 'short' => true, 'month_id' => 43], // Chibi-Robo!
+            ['id' => '35282', 'short' => false, 'month_id' => 44], // CrossCode
+            ['id' => '2136', 'short' => true, 'month_id' => 44] // Bayonetta
         );
 
         foreach ($winnerEntries as $winnerEntry) {

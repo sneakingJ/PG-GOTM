@@ -2,10 +2,13 @@
 
 namespace App\Http\Livewire;
 
+use App\Lib\MonthStatus;
+use App\Models\Month;
 use Livewire\Component;
 use Illuminate\Support\Str;
 use MarcReichel\IGDBLaravel\Models\Game;
 use App\Models\Nomination;
+use App\Models\Pitch;
 use App\Models\Winner;
 
 /**
@@ -28,7 +31,7 @@ class NominateModal extends Component
     /**
      * @var int
      */
-    public int $monthId = 2;
+    public int $monthId = 0;
 
     /**
      * @var bool
@@ -53,11 +56,6 @@ class NominateModal extends Component
     /**
      * @var string
      */
-    public string $gameUrl = '';
-
-    /**
-     * @var string
-     */
     public string $gamePitch = '';
 
     /**
@@ -72,6 +70,8 @@ class NominateModal extends Component
      */
     public function render(): \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\Foundation\Application
     {
+        $this->monthId = Month::where('status', MonthStatus::NOMINATING)->first()->id;
+
         return view('components.nominate-modal');
     }
 
@@ -162,8 +162,15 @@ class NominateModal extends Component
         $nomination->game_cover = empty($game->cover['url']) ? '' : $game->cover['url'];
         $nomination->game_url = $game->url;
         $nomination->game_platform_ids = is_array($game->platforms) ? implode(',', $game->platforms) : $game->platforms;
-        $nomination->pitch = Str::limit($this->gamePitch, 1000, ' (...)');
         $nomination->short = $this->gameShort;
         $nomination->save();
+
+        if (!empty($this->gamePitch)) {
+            $pitch = new Pitch();
+            $pitch->nomination_id = $nomination->id;
+            $pitch->discord_id = $userId;
+            $pitch->pitch = Str::limit($this->gamePitch, 1000, ' (...)');
+            $pitch->save();
+        }
     }
 }
