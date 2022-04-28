@@ -10,10 +10,10 @@
                 <p class="title is-4">{{ $nomination->game_name }}</p>
                 <p class="subtitle is-size-5 is-relative">
                     @php
-                        $firstPitch = $nomination->pitches()->first()
+                        $firstPitch = $nomination->pitches()->first();
                     @endphp
                     @if(!empty($firstPitch))
-                        <span class="pitch" wire:click="$emitTo('nomination-list', 'activateModal', '{{ preg_replace('/[\r\n]+/', '<br />', htmlentities($firstPitch->pitch)) }}', '{{ htmlentities($nomination->game_name) }}', '{{ $nomination->game_cover }}')">
+                        <span class="pitch" wire:click="$emitTo('voting-list', 'activateModal', '{{ preg_replace('/[\r\n]+/', '<br />', htmlentities($firstPitch->pitch)) }}', '{{ htmlentities($nomination->game_name) }}', '{{ $nomination->game_cover }}')">
                             {{ \Illuminate\Support\Str::limit($firstPitch->pitch, 50, '... ') }}
                             @if (\Illuminate\Support\Str::length($firstPitch->pitch) > 50)
                                 <i class="fas fa-sort-down"></i>
