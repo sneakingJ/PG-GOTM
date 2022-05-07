@@ -4,8 +4,11 @@ namespace App\Http\Livewire;
 
 use App\Lib\MonthStatus;
 use App\Models\Month;
+use App\Models\Pitch;
+use Illuminate\Support\Str;
 use Livewire\Component;
 use App\Models\Nomination;
+use Livewire\Redirector;
 
 /**
  *
@@ -15,7 +18,17 @@ class NominationList extends Component
     /**
      * @var string[]
      */
-    protected $listeners = ['activateModal', 'disableModal'];
+    protected $listeners = ['activateModal', 'disableModal', 'addPitch', 'closeNewPitchModal', 'savePitch'];
+
+    /**
+     * @var string[]
+     */
+    protected $rules = [
+        'userPitch.discord_id' => 'required',
+        'userPitch.nomination_id' => 'required',
+        'userPitch.pitch' => 'required'
+    ];
+
 
     /**
      * @var \Illuminate\Database\Eloquent\Collection
@@ -33,25 +46,33 @@ class NominationList extends Component
     public bool $pitchModalActive = false;
 
     /**
-     * @var string
+     * @var bool
      */
-    public string $modalName = '';
+    public bool $newPitchModalActive = false;
 
     /**
      * @var string
      */
-    public string $modalPitch = '';
+    public string $userId;
 
     /**
-     * @var string
+     * @var Nomination
      */
-    public string $modalCover = '';
+    public Nomination $nomination;
+
+    /**
+     * @var Pitch
+     */
+    public Pitch $userPitch;
 
     /**
      * @return \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\Foundation\Application
      */
     public function render(): \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\Foundation\Application
     {
+        $user = session('auth');
+        $this->userId = empty($user) ? 0 : $user['id'];
+
         $monthId = Month::where('status', MonthStatus::NOMINATING)->first()->id;
 
         $this->shortNominations = Nomination::where('month_id', $monthId)->where('short', 1)->orderBy('created_at', 'desc')->get();
@@ -66,10 +87,12 @@ class NominationList extends Component
      */
     public function activateModal(int $nominationId): void
     {
-        $nomination = Nomination::find($nominationId);
-        $this->modalName = html_entity_decode($nomination->game_name);
-        $this->modalCover = $nomination->game_cover;
-        $this->modalPitch = $this->markupPitch($nomination->pitches()->get());
+        $this->nomination = Nomination::find($nominationId);
+
+        $this->userPitch = $this->nomination->pitches()->firstOrNew([
+            'discord_id' => $this->userId,
+            'nomination_id' => $nominationId
+        ]);
 
         $this->pitchModalActive = true;
     }
@@ -83,28 +106,34 @@ class NominationList extends Component
     }
 
     /**
-     * @param \Illuminate\Database\Eloquent\Collection $pitches
-     * @return string
+     * @return Redirector|null
      */
-    private function markupPitch(\Illuminate\Database\Eloquent\Collection $pitches): string
+    public function addPitch(): ?Redirector
     {
-        //$user = session('auth');
+        if (empty($this->userId)) {
+            Request()->session()->put('url.intended', '/');
 
-        $markup = '<ul>';
-        foreach ($pitches as $pitch) {
-            $markup .= '<li>';
-            /*if ($user['id'] == $pitch->discord_id) {
-                $markup .= '<textarea class="pitch_edit textarea" name="pitch_edit">';
-            }*/
-            $markup .= html_entity_decode($pitch->pitch);
-
-            /*if ($user['id'] == $pitch->discord_id) {
-                $markup .= '</textarea>';
-            }*/
-            $markup .= '</li>';
+            return redirect()->route('login');
         }
-        $markup .= '</ul>';
 
-        return $markup;
+        $this->newPitchModalActive = true;
+        return null;
+    }
+
+    /**
+     */
+    public function closeNewPitchModal(): void
+    {
+        $this->newPitchModalActive = false;
+    }
+
+    /**
+     */
+    public function savePitch(): void
+    {
+        $this->userPitch->pitch = Str::limit($this->userPitch->pitch, 1000, ' (...)');
+        $this->userPitch->save();
+
+        $this->closeNewPitchModal();
     }
 }
