@@ -5,7 +5,7 @@
         </div>
     </div>
 
-    <div class="box" wire:poll.10000ms>
+    <div class="box" @if(!$pitchModalActive) wire:poll.10000ms @endif>
         <div class="columns">
             <div class="column is-half">
                 <h2 class="title is-3">Long Games</h2>
@@ -38,7 +38,7 @@
                             </div>
                         </div>
                         <div class="column is-four-fifths">
-                            @include('livewire.snippets.nomination-list-pitches', ['pitches' => $nomination->pitches()->get()])
+                            @include('livewire.snippets.nomination-list-pitches', ['pitches' => $nomination->pitches()->orderBy('created_at')->get()])
                         </div>
                     </div>
                 </section>
