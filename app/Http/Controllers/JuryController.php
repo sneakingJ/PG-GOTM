@@ -17,8 +17,8 @@ class JuryController extends Component
     {
         $user = session('auth');
 
-        if (empty($user) || !JuryMember::where('discord_id', $user['id'])->exists()) {
-            return view('jury-members', ['members' => JuryMember::all()]);
+        if (empty($user) || !JuryMember::where('discord_id', $user['id'])->where('active', true)->exists()) {
+            return view('jury-members', ['members' => JuryMember::where('active', true)->get()]);
         }
 
         return view('jury-duty');

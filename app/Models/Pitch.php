@@ -8,4 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class Pitch extends Model
 {
     use HasFactory;
+
+    protected $fillable = ['discord_id', 'nomination_id'];
 }

@@ -82,3 +82,12 @@
 .nomination-list .pitch {
     cursor: pointer;
 }
+
+.modal-pitches-list {
+    max-height: 400px;
+}
+.modal-pitches-list p {
+    background-color: #566573;
+    padding: 10px;
+    border-radius: 5px;
+}
