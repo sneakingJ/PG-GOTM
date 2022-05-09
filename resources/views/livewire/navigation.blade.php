@@ -27,4 +27,10 @@
             <span>Jury Members</span>
         </a>
     </li>
+    <li class="{{ (Route::currentRouteName() == 'privacy') ? 'is-active' : '' }}">
+        <a href="{{ route('privacy') }}">
+            <span class="icon is-small"><i class="fas fa-lock" aria-hidden="true"></i></span>
+            <span>Privacy</span>
+        </a>
+    </li>
 </ul>
