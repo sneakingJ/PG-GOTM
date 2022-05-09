@@ -13,8 +13,9 @@
                 <x-laravel-blade-sortable::sortable group="long" name="long" :allow-drop="false" wire:onSortOrderChange="sortChange">
                     @each('livewire.cards.voting-list-card', $longNominations, 'nomination')
                 </x-laravel-blade-sortable::sortable>
+                <button class="button" type="button" wire:click="$emitTo('voting-list', 'saveVote', 'long')">Save Long</button>
             </div>
-            <div class="column is-narrow is-hidden-mobile">
+            <div class="column is-narrow is-hidden-mobile has-text-centered">
                 <h2 class="title is-3">&nbsp;</h2>
                 <div class="voting-number">
                     1
@@ -25,23 +26,15 @@
                 <div class="voting-number">
                     3
                 </div>
+                <label class="checkbox mt-3"><input type="checkbox" wire:model="saveOnDrop"><br>Save on Drop</label>
             </div>
             <div class="column">
                 <h2 class="title is-3">Short Games</h2>
                 <x-laravel-blade-sortable::sortable group="short" name="short" :allow-drop="false" wire:onSortOrderChange="sortChange">
                     @each('livewire.cards.voting-list-card', $shortNominations, 'nomination')
                 </x-laravel-blade-sortable::sortable>
-            </div>
-        </div>
-        <div class="columns">
-            <div class="column">
-                <button class="button" type="button" wire:click="$emitTo('voting-list', 'saveVote', 'long')">Save Long</button>
-            </div>
-            <div class="column is-narrow has-text-centered">
-                <label class="checkbox"><input type="checkbox" wire:model="saveOnDrop"><br>Save on Drop</label>
-            </div>
-            <div class="column">
-                <button class="button is-pulled-right" type="button" wire:click="$emitTo('voting-list', 'saveVote', 'short')">Save Short</button>
+                <button class="button is-pulled-right is-hidden-mobile" type="button" wire:click="$emitTo('voting-list', 'saveVote', 'short')">Save Short</button>
+                <button class="button is-hidden-tablet" type="button" wire:click="$emitTo('voting-list', 'saveVote', 'short')">Save Short</button>
             </div>
         </div>
     </div>
