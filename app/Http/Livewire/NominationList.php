@@ -131,8 +131,12 @@ class NominationList extends Component
      */
     public function savePitch(): void
     {
-        $this->userPitch->pitch = Str::limit($this->userPitch->pitch, 1000, ' (...)');
-        $this->userPitch->save();
+        if (Str::length($this->userPitch->pitch) >= 1) {
+            $this->userPitch->pitch = Str::limit($this->userPitch->pitch, 1000, ' (...)');
+            $this->userPitch->save();
+        } elseif ($this->userPitch->exists) {
+            $this->userPitch->delete();
+        }
 
         $this->closeNewPitchModal();
     }
