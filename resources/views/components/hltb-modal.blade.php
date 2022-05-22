@@ -23,7 +23,7 @@
                                 <div class="media">
                                     <div class="media-left">
                                         <figure class="image igdb-cover">
-                                            <img src="https://howlongtobeat.com{{ $result['Image'] }}">
+                                            <img src="{{ $result['Image'] }}">
                                         </figure>
                                     </div>
                                     <div class="media-content">
