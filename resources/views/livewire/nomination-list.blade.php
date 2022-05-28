@@ -10,13 +10,13 @@
             <div class="column is-half">
                 <h2 class="title is-3">Long Games</h2>
                 <div class="game-list">
-                    @each('livewire.cards.nomination-list-card', $longNominations, 'nomination')
+                    @each('livewire.cards.nominations-list-card', $longNominations, 'nomination')
                 </div>
             </div>
             <div class="column is-half">
                 <h2 class="title is-3">Short Games</h2>
                 <div class="game-list">
-                    @each('livewire.cards.nomination-list-card', $shortNominations, 'nomination')
+                    @each('livewire.cards.nominations-list-card', $shortNominations, 'nomination')
                 </div>
             </div>
         </div>

@@ -13,7 +13,7 @@
             <div class="column">
                 <h2 class="title is-3">Long Games</h2>
                 <x-laravel-blade-sortable::sortable group="long" name="long" :allow-drop="false" wire:onSortOrderChange="sortChange">
-                    @each('livewire.cards.voting-list-card', $longNominations, 'nomination')
+                    @each('livewire.cards.nominations-list-card', $longNominations, 'nomination')
                 </x-laravel-blade-sortable::sortable>
                 <button class="button" type="button" wire:click="$emitTo('voting-list', 'saveVote', 'long')">Save Long</button>
             </div>
@@ -33,7 +33,7 @@
             <div class="column">
                 <h2 class="title is-3">Short Games</h2>
                 <x-laravel-blade-sortable::sortable group="short" name="short" :allow-drop="false" wire:onSortOrderChange="sortChange">
-                    @each('livewire.cards.voting-list-card', $shortNominations, 'nomination')
+                    @each('livewire.cards.nominations-list-card', $shortNominations, 'nomination')
                 </x-laravel-blade-sortable::sortable>
                 <button class="button is-pulled-right is-hidden-mobile" type="button" wire:click="$emitTo('voting-list', 'saveVote', 'short')">Save Short</button>
                 <button class="button is-hidden-tablet" type="button" wire:click="$emitTo('voting-list', 'saveVote', 'short')">Save Short</button>
