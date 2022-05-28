@@ -1,7 +1,9 @@
 <div class="voting">
     <div class="columns is-centered">
         <div class="column is-narrow has-text-centered">
-            <h1 class="title is-2">Drag and Drop the games to rank them</h1>
+            <h1 class="title is-2">Drag and Drop the games</h1>
+            <h1 class="title is-4">to sort them in the priority you want them to win</h1>
+            <p></p>
             <p>Please only vote for games you actually want to play next month :)</p>
         </div>
     </div>

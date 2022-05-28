@@ -1,7 +1,8 @@
 <div class="block">
     <div class="columns is-centered">
         <div class="column is-narrow">
-            <h1 class="title is-2">Current Standings</h1>
+            <h1 class="title is-2 has-text-centered">Current Standings</h1>
+            <p class="has-text-centered"><a href="#" wire:click="$emitTo('voting-result', 'activateModal')">What is Ranked Choice Voting?</a></p>
         </div>
     </div>
     <script type="text/javascript">
@@ -79,4 +80,22 @@
             }
         </script>
     </div>
+
+    @if($modalActive)
+        <div class="modal is-active">
+            <div class="modal-background"></div>
+            <div class="modal-card">
+                <header class="modal-card-head">
+                    <p class="modal-card-title">What is Ranked Choice Voting?</p>
+                    <button class="delete" aria-label="close" type="button" wire:click="$emitTo('voting-result', 'disableModal')"></button>
+                </header>
+                <section class="modal-card-body has-text-centered">
+                    <iframe width="560" height="315" src="https://www.youtube.com/embed/oHRPMJmzBBw" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                </section>
+                <footer class="column modal-card-foot">
+                    <button class="button is-pulled-right" type="button" wire:click="$emitTo('voting-result', 'disableModal')">Close</button>
+                </footer>
+            </div>
+        </div>
+    @endif
 </div>
