@@ -12,7 +12,7 @@
                     @php
                         $firstPitch = $nomination->pitches()->orderBy('created_at')->first()
                     @endphp
-                    <span class="pitch" wire:click="$emitTo('voting-list', 'activateModal', '{{ $nomination->id }}')">
+                    <span class="pitch" wire:click="$emitTo('pitches-modal', 'activateModal', '{{ $nomination->id }}')">
                         @if(!empty($firstPitch))
                             {{ \Illuminate\Support\Str::limit($firstPitch->pitch, 50, '... ') }}
                             <i class="fas fa-pen"></i>

@@ -38,7 +38,7 @@ class HltbModal extends Component
      * @param string $gameName
      * @return void
      */
-    public function activateModal(string $gameName)
+    public function activateModal(string $gameName): void
     {
         $hl2b = new HowLongToBeat();
         $result = $hl2b->search($gameName);
@@ -50,7 +50,7 @@ class HltbModal extends Component
     /**
      * @return void
      */
-    public function disableModal()
+    public function disableModal(): void
     {
         $this->active = false;
     }

@@ -18,7 +18,7 @@ class VotingList extends Component
     /**
      * @var string[]
      */
-    protected $listeners = ['saveVote', 'activateModal', 'disableModal'];
+    protected $listeners = ['saveVote'];
 
     /**
      * @var Collection
@@ -34,16 +34,6 @@ class VotingList extends Component
      * @var bool
      */
     public bool $saveOnDrop = false;
-
-    /**
-     * @var bool
-     */
-    public bool $pitchModalActive = false;
-
-    /**
-     * @var Nomination
-     */
-    public Nomination $modalNomination;
 
     /**
      * @var array
@@ -78,25 +68,6 @@ class VotingList extends Component
     public function updatingSaveOnDrop($value, $key): void
     {
         Cookie::queue('saveOnDrop', $value, 525960);
-    }
-
-    /**
-     * @param int $nominationId
-     * @return void
-     */
-    public function activateModal(int $nominationId): void
-    {
-        $this->modalNomination = Nomination::find($nominationId);
-
-        $this->pitchModalActive = true;
-    }
-
-    /**
-     * @return void
-     */
-    public function disableModal(): void
-    {
-        $this->pitchModalActive = false;
     }
 
     /**
