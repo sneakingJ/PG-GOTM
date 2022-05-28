@@ -42,4 +42,5 @@
     </div>
 
     @livewire('pitches-modal', array('editPossible' => false))
+    <livewire:hltb-modal/>
 </div>

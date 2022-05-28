@@ -23,4 +23,5 @@
     </div>
 
     @livewire('pitches-modal', array('editPossible' => true))
+    <livewire:hltb-modal/>
 </div>
