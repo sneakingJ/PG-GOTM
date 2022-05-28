@@ -41,28 +41,30 @@
         </div>
     </div>
 
-    <div class="modal @if($pitchModalActive) is-active @endif">
-        <div class="modal-background"></div>
-        <div class="modal-card">
-            <header class="modal-card-head">
-                <p class="modal-card-title">{{ $modalName }}</p>
-                <button class="delete" aria-label="close" type="button" wire:click="$emitTo('voting-list', 'disableModal')"></button>
-            </header>
-            <section class="modal-card-body">
-                <div class="columns">
-                    <div class="column is-one-fifth">
-                        <div class="igdb-cover">
-                            <img src="{{ $modalCover }}">
+    @if(!empty($modalNomination) && $pitchModalActive)
+        <div class="modal is-active">
+            <div class="modal-background"></div>
+            <div class="modal-card">
+                <header class="modal-card-head">
+                    <p class="modal-card-title">{!! html_entity_decode($modalNomination->game_name) !!}</p>
+                    <button class="delete" aria-label="close" type="button" wire:click="$emitTo('voting-list', 'disableModal')"></button>
+                </header>
+                <section class="modal-card-body">
+                    <div class="columns">
+                        <div class="column is-one-fifth">
+                            <div class="igdb-cover">
+                                <img src="{{ $modalNomination->game_cover }}">
+                            </div>
+                        </div>
+                        <div class="column is-four-fifths">
+                            @include('livewire.snippets.nomination-list-pitches', ['pitches' => $modalNomination->pitches()->orderBy('created_at')->get()])
                         </div>
                     </div>
-                    <div class="column is-four-fifths">
-                        {!! $modalPitch !!}
-                    </div>
-                </div>
-            </section>
-            <footer class="modal-card-foot">
-                <button class="button" type="button" wire:click="$emitTo('voting-list', 'disableModal')">Close</button>
-            </footer>
+                </section>
+                <footer class="modal-card-foot">
+                    <button class="button" type="button" wire:click="$emitTo('voting-list', 'disableModal')">Close</button>
+                </footer>
+            </div>
         </div>
-    </div>
+    @endif
 </div>

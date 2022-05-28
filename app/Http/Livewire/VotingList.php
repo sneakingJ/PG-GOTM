@@ -41,19 +41,9 @@ class VotingList extends Component
     public bool $pitchModalActive = false;
 
     /**
-     * @var string
+     * @var Nomination
      */
-    public string $modalName = '';
-
-    /**
-     * @var string
-     */
-    public string $modalPitch = '';
-
-    /**
-     * @var string
-     */
-    public string $modalCover = '';
+    public Nomination $modalNomination;
 
     /**
      * @var array
@@ -63,7 +53,7 @@ class VotingList extends Component
     /**
      * @return void
      */
-    public function boot()
+    public function boot(): void
     {
         $this->saveOnDrop = Cookie::get('saveOnDrop') ?? false;
     }
@@ -85,29 +75,26 @@ class VotingList extends Component
     /**
      * @return void
      */
-    public function updatingSaveOnDrop($value, $key)
+    public function updatingSaveOnDrop($value, $key): void
     {
         Cookie::queue('saveOnDrop', $value, 525960);
     }
 
     /**
-     * @param string $pitch
-     * @param string $gameName
-     * @param string $cover
+     * @param int $nominationId
      * @return void
      */
-    public function activateModal(string $pitch, string $gameName, string $cover)
+    public function activateModal(int $nominationId): void
     {
-        $this->modalName = html_entity_decode($gameName);
-        $this->modalPitch = html_entity_decode($pitch);
-        $this->modalCover = $cover;
+        $this->modalNomination = Nomination::find($nominationId);
+
         $this->pitchModalActive = true;
     }
 
     /**
      * @return void
      */
-    public function disableModal()
+    public function disableModal(): void
     {
         $this->pitchModalActive = false;
     }
@@ -120,7 +107,7 @@ class VotingList extends Component
      * @param $to
      * @return void
      */
-    public function sortChange($sortOrder, $previousSortOrder, $name, $from, $to)
+    public function sortChange($sortOrder, $previousSortOrder, $name, $from, $to): void
     {
         $short = ($name === 'short') ? 1 : 0;
         $this->currentOrder[$short] = $sortOrder;
@@ -134,7 +121,7 @@ class VotingList extends Component
      * @param $name
      * @return void
      */
-    public function saveVote($name)
+    public function saveVote($name): void
     {
         $user = session('auth');
         $monthId = Month::where('status', MonthStatus::VOTING)->first()->id;

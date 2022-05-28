@@ -10,18 +10,16 @@
                 <p class="title is-4">{{ $nomination->game_name }}</p>
                 <p class="subtitle is-size-5 is-relative">
                     @php
-                        $firstPitch = $nomination->pitches()->first();
+                        $firstPitch = $nomination->pitches()->orderBy('created_at')->first()
                     @endphp
-                    @if(!empty($firstPitch))
-                        <span class="pitch" wire:click="$emitTo('voting-list', 'activateModal', '{{ preg_replace('/[\r\n]+/', '<br />', htmlentities($firstPitch->pitch)) }}', '{{ htmlentities($nomination->game_name) }}', '{{ $nomination->game_cover }}')">
+                    <span class="pitch" wire:click="$emitTo('voting-list', 'activateModal', '{{ $nomination->id }}')">
+                        @if(!empty($firstPitch))
                             {{ \Illuminate\Support\Str::limit($firstPitch->pitch, 50, '... ') }}
-                            @if (\Illuminate\Support\Str::length($firstPitch->pitch) > 50)
-                                <i class="fas fa-sort-down"></i>
-                            @endif
-                        </span><br><br>
-                    @else
-                        <span></span><br><br>
-                    @endif
+                            <i class="fas fa-pen"></i>
+                        @else
+                            <i class="fas fa-pen"></i>
+                        @endif
+                    </span><br><br>
                     <a href="{{ $nomination->game_url }}" target="_blank" class="is-size-6"><span class="icon is-small"><i class="fas fa-external-link-alt" aria-hidden="true"></i></span> <span>IGDB</span></a>
                 </p>
             </div>
