@@ -112,6 +112,8 @@ class VotingList extends Component
         $vote->rank_3 = $this->currentOrder[$short][2];
 
         $vote->save();
+
+        $this->emitTo('vote-status', 'setVoted', true);
     }
 
     /**
