@@ -15,7 +15,8 @@
                 <x-laravel-blade-sortable::sortable group="long" name="long" :allow-drop="false" wire:onSortOrderChange="sortChange">
                     @each('livewire.cards.nominations-list-card', $longNominations, 'nomination')
                 </x-laravel-blade-sortable::sortable>
-                <button class="button is-pulled-left" type="button" wire:click="$emitTo('voting-list', 'saveVote', 'long')">Save Long</button>
+                <button class="button is-pulled-left" type="button" wire:click="$emitTo('voting-list', 'saveVote', false)">Save Long</button>
+                @if($votedLong)<button class="button is-pulled-left ml-4" type="button" wire:click="$emitTo('voting-list', 'deleteVote', false)">Unvote Long</button>@endif
                 @livewire('vote-status', array('short' => false))
             </div>
             <div class="column is-narrow is-hidden-touch has-text-centered">
@@ -36,7 +37,8 @@
                 <x-laravel-blade-sortable::sortable group="short" name="short" :allow-drop="false" wire:onSortOrderChange="sortChange">
                     @each('livewire.cards.nominations-list-card', $shortNominations, 'nomination')
                 </x-laravel-blade-sortable::sortable>
-                <button class="button is-pulled-left" type="button" wire:click="$emitTo('voting-list', 'saveVote', 'short')">Save Short</button>
+                <button class="button is-pulled-left" type="button" wire:click="$emitTo('voting-list', 'saveVote', true)">Save Short</button>
+                @if($votedShort)<button class="button is-pulled-left ml-4" type="button" wire:click="$emitTo('voting-list', 'deleteVote', true)">Unvote Short</button>@endif
                 @livewire('vote-status', array('short' => true))
             </div>
         </div>

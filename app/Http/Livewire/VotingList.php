@@ -18,7 +18,17 @@ class VotingList extends Component
     /**
      * @var string[]
      */
-    protected $listeners = ['saveVote'];
+    protected $listeners = ['saveVote', 'deleteVote'];
+
+    /**
+     * @var int
+     */
+    public int $monthId = 0;
+
+    /**
+     * @var string
+     */
+    public string $userId;
 
     /**
      * @var Collection
@@ -29,6 +39,16 @@ class VotingList extends Component
      * @var Collection
      */
     public Collection $longNominations;
+
+    /**
+     * @var bool
+     */
+    public bool $votedShort = false;
+
+    /**
+     * @var bool
+     */
+    public bool $votedLong = false;
 
     /**
      * @var bool
@@ -53,11 +73,16 @@ class VotingList extends Component
      */
     public function render(): \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\Foundation\Application
     {
-        $user = session('auth');
-        $monthId = Month::where('status', MonthStatus::VOTING)->first()->id;
+        $this->monthId = Month::where('status', MonthStatus::VOTING)->first()->id;
 
-        $this->shortNominations = $this->fetchNominations($user['id'], $monthId, true);
-        $this->longNominations = $this->fetchNominations($user['id'], $monthId, false);
+        $user = session('auth');
+        $this->userId = empty($user) ? 0 : $user['id'];
+
+        $this->shortNominations = $this->fetchNominations(true);
+        $this->longNominations = $this->fetchNominations(false);
+
+        $this->votedShort = Vote::where('month_id', $this->monthId)->where('discord_id', $this->userId)->where('short', true)->exists();
+        $this->votedLong = Vote::where('month_id', $this->monthId)->where('discord_id', $this->userId)->where('short', false)->exists();
 
         return view('livewire.voting-list');
     }
@@ -73,37 +98,32 @@ class VotingList extends Component
     /**
      * @param $sortOrder
      * @param $previousSortOrder
-     * @param $name
+     * @param bool $short
      * @param $from
      * @param $to
      * @return void
      */
-    public function sortChange($sortOrder, $previousSortOrder, $name, $from, $to): void
+    public function sortChange($sortOrder, $previousSortOrder, bool $short, $from, $to): void
     {
-        $short = ($name === 'short') ? 1 : 0;
-        $this->currentOrder[$short] = $sortOrder;
+        $this->currentOrder[(int)$short] = $sortOrder;
 
         if ($this->saveOnDrop) {
-            $this->saveVote($name);
+            $this->saveVote($short);
         }
     }
 
     /**
-     * @param $name
+     * @param bool $short
      * @return void
      */
-    public function saveVote($name): void
+    public function saveVote(bool $short): void
     {
-        $user = session('auth');
-        $monthId = Month::where('status', MonthStatus::VOTING)->first()->id;
-        $short = ($name === 'short');
-
-        $vote = Vote::where('month_id', $monthId)->where('discord_id', $user['id'])->where('short', $short)->first();
+        $vote = Vote::where('month_id', $this->monthId)->where('discord_id', $this->userId)->where('short', $short)->first();
 
         if (empty($vote)) {
             $vote = new Vote();
-            $vote->month_id = $monthId;
-            $vote->discord_id = $user['id'];
+            $vote->month_id = $this->monthId;
+            $vote->discord_id = $this->userId;
             $vote->short = $short;
         }
 
@@ -117,21 +137,34 @@ class VotingList extends Component
     }
 
     /**
-     * @param $userId
-     * @param $monthId
+     * @param bool $short
+     * @return void
+     */
+    public function deleteVote(bool $short): void
+    {
+        $vote = Vote::where('month_id', $this->monthId)->where('discord_id', $this->userId)->where('short', $short)->first();
+
+        if (!empty($vote)) {
+            $vote->delete();
+
+            $this->emitTo('vote-status', 'setVoted', false);
+        }
+    }
+
+    /**
      * @param bool $short
      * @return Collection
      */
-    private function fetchNominations($userId, $monthId, bool $short): Collection
+    private function fetchNominations(bool $short): Collection
     {
-        $vote = Vote::where('discord_id', $userId)->where('month_id', $monthId)->where('short', $short)->first();
+        $vote = Vote::where('discord_id', $this->userId)->where('month_id', $this->monthId)->where('short', $short)->first();
 
         if (!empty($this->currentOrder[(int)$short])) {
             return new Collection([Nomination::find($this->currentOrder[(int)$short][0]), Nomination::find($this->currentOrder[(int)$short][1]), Nomination::find($this->currentOrder[(int)$short][2])]);
         }
 
         if (empty($vote)) {
-            $nominations = Nomination::where('month_id', $monthId)->where('jury_selected', true)->where('short', $short)->inRandomOrder()->get();
+            $nominations = Nomination::where('month_id', $this->monthId)->where('jury_selected', true)->where('short', $short)->inRandomOrder()->get();
             $this->currentOrder[(int)$short] = $nominations->pluck('id');
             return $nominations;
         }
