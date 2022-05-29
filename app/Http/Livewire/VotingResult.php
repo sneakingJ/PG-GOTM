@@ -14,11 +14,6 @@ use App\Models\Vote;
 class VotingResult extends Component
 {
     /**
-     * @var string[]
-     */
-    protected $listeners = ['activateModal', 'disableModal'];
-
-    /**
      * @var array
      */
     public array $shortResult;
@@ -27,11 +22,6 @@ class VotingResult extends Component
      * @var array
      */
     public array $longResult;
-
-    /**
-     * @var bool
-     */
-    public bool $modalActive = false;
 
     /**
      * @return \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\Foundation\Application
@@ -44,22 +34,6 @@ class VotingResult extends Component
         $this->shortResult = $this->prepareChartData($monthId,true);
 
         return view('livewire.voting-result');
-    }
-
-    /**
-     * @return void
-     */
-    public function activateModal(): void
-    {
-        $this->modalActive = true;
-    }
-
-    /**
-     * @return void
-     */
-    public function disableModal(): void
-    {
-        $this->modalActive = false;
     }
 
     /**
