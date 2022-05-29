@@ -98,14 +98,15 @@ class VotingList extends Component
     /**
      * @param $sortOrder
      * @param $previousSortOrder
-     * @param bool $short
+     * @param string $name
      * @param $from
      * @param $to
      * @return void
      */
-    public function sortChange($sortOrder, $previousSortOrder, bool $short, $from, $to): void
+    public function sortChange($sortOrder, $previousSortOrder, string $name, $from, $to): void
     {
-        $this->currentOrder[(int)$short] = $sortOrder;
+        $short = ($name === 'short') ? 1 : 0;
+        $this->currentOrder[$short] = $sortOrder;
 
         if ($this->saveOnDrop) {
             $this->saveVote($short);
