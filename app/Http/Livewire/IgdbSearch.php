@@ -2,6 +2,10 @@
 
 namespace App\Http\Livewire;
 
+use App\Lib\MonthStatus;
+use App\Models\Month;
+use App\Models\Nomination;
+use App\Models\Winner;
 use Livewire\Component;
 use MarcReichel\IGDBLaravel\Models\Game;
 use Illuminate\Support\Str;
@@ -12,6 +16,11 @@ use App\Models\IgdbPlatform;
  */
 class IgdbSearch extends Component
 {
+    /**
+     * @var int
+     */
+    public int $monthId = 0;
+
     /**
      * @var string
      */
@@ -41,6 +50,8 @@ class IgdbSearch extends Component
      */
     public function render(): \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Contracts\Foundation\Application
     {
+        $this->monthId = Month::where('status', MonthStatus::NOMINATING)->first()->id;
+
         $this->noResults = false;
         $this->games = array();
 
@@ -88,6 +99,9 @@ class IgdbSearch extends Component
 
             $platforms = empty($item->platforms) ? array() : $item->platforms;
             $game['platforms'] = IgdbPlatform::whereIn('igdb_id', $platforms)->whereNotNull('logo')->get();
+
+            $game['alreadyNominated'] = Nomination::where('month_id', $this->monthId)->where('game_id', $item->id)->exists();
+            $game['alreadyWon'] = Winner::where('game_id', $item->id)->exists();
 
             $gameList[] = $game;
         });

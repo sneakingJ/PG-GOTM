@@ -34,7 +34,8 @@
 
     <div class="game-list-search" wire:loading.remove>
         @foreach($games as $game)
-            <div class="card mb-4 is-clickable is-hoverable" wire:click="$emitTo('nominate-modal', 'activateModal', '{{ $game['id'] }}', '{{ htmlentities($game['name']) }}', '{{ $game['cover'] }}')">
+            <div class="card mb-4 is-hoverable @if(!$game['alreadyNominated'] && !$game['alreadyWon'])is-clickable @endif"
+                 @if(!$game['alreadyNominated'] && !$game['alreadyWon'])wire:click="$emitTo('nominate-modal', 'activateModal', '{{ $game['id'] }}', '{{ htmlentities($game['name']) }}', '{{ $game['cover'] }}')" @endif>
                 <div class="card-content">
                     <div class="media">
                         <div class="media-left">
@@ -43,7 +44,10 @@
                             </figure>
                         </div>
                         <div class="media-content">
-                            <p class="title is-4 mb-0">{{ $game['name'] }} ({{ $game['year'] }})</p>
+                            <p class="title is-4 mb-0">{{ $game['name'] }} ({{ $game['year'] }})
+                                @if($game['alreadyNominated'])- <span class="invalid">Already nominated</span>@endif
+                                @if($game['alreadyWon'])- <span class="invalid">Already was GOTM</span>@endif
+                            </p>
                             <div class="platformlist is-clearfix">
                                 @foreach($game['platforms'] as $platform)
                                     <div class="platform-image">

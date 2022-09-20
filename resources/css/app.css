@@ -35,6 +35,9 @@
 .igdb-box .is-hoverable:hover {
     background-color: #566573;
 }
+.igdb-box .invalid {
+    color: #f1b70e;
+}
 
 .platformlist {
     min-height: 45px;
