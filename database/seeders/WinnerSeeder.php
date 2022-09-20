@@ -108,7 +108,17 @@ class WinnerSeeder extends Seeder
             ['id' => '1271', 'short' => false, 'month_id' => 43], // Ōkami
             ['id' => '3856', 'short' => true, 'month_id' => 43], // Chibi-Robo!
             ['id' => '35282', 'short' => false, 'month_id' => 44], // CrossCode
-            ['id' => '2136', 'short' => true, 'month_id' => 44] // Bayonetta
+            ['id' => '2136', 'short' => true, 'month_id' => 44], // Bayonetta
+            ['id' => '22652', 'short' => false, 'month_id' => 45], // Shadowrun: Dragonfall
+            ['id' => '338', 'short' => true, 'month_id' => 45], // Half-Life 2: Episode One
+            ['id' => '832', 'short' => false, 'month_id' => 51], // Planescape: Torment
+            ['id' => '7357', 'short' => true, 'month_id' => 51], // Parasite Eve
+            ['id' => '571', 'short' => false, 'month_id' => 61], // Singularity
+            ['id' => '1348', 'short' => true, 'month_id' => 61], // Ghost Trick: Phantom Detective
+            ['id' => '8986', 'short' => false, 'month_id' => 71], // The Legend of Heroes: Trails in the Sky
+            ['id' => '15465', 'short' => true, 'month_id' => 71], // VA-11 HALL-A: Cyberpunk Bartender Action
+            ['id' => '974', 'short' => false, 'month_id' => 81], // Resident Evil 4
+            ['id' => '517', 'short' => true, 'month_id' => 81] // F.E.A.R.
         );
 
         foreach ($winnerEntries as $winnerEntry) {
