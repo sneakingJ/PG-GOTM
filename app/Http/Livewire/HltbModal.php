@@ -41,7 +41,7 @@ class HltbModal extends Component
     public function activateModal(string $gameName): void
     {
         $hl2b = new HowLongToBeat();
-        $result = $hl2b->search($gameName);
+        $result = $hl2b->search(htmlspecialchars_decode($gameName));
 
         $this->results = $result['Results'];
         $this->active = true;

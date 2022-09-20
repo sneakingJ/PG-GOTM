@@ -28,7 +28,7 @@
                                 Long Game (> 12h HLTB Main Story)
                             </label>
                         </div>
-                        <button type="button" class="button is-pulled-right mt-5" wire:click="$emitTo('hltb-modal', 'activateModal', '{{ $gameName }}')" onclick="buttonLoad(this);">Get HLTB times</button>
+                        <button type="button" class="button is-pulled-right mt-5" wire:click="$emitTo('hltb-modal', 'activateModal', '{{ htmlspecialchars($gameName) }}')" onclick="buttonLoad(this);">Get HLTB times</button>
                     </div>
                 </div>
             </section>
