@@ -18,6 +18,7 @@ Route::get('/', MainController::class)->name('main');
 Route::get('/nominate', NominateController::class)->name('nominate')->middleware('auth.discord');
 Route::get('/voting', VotingController::class)->name('voting')->middleware('auth.discord');
 Route::get('/jury', JuryController::class)->name('jury');
+Route::get('/jury-members', JuryMemberController::class)->name('jury-members');
 Route::get('/privacy', PrivacyController::class)->name('privacy');
 
 Route::get('/discord-auth/login', [DiscordController::class, 'login'])->name('login');

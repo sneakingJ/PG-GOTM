@@ -5,8 +5,8 @@
             <span>Main</span>
         </a>
     </li>
-    <li class="{{ (Route::currentRouteName() == 'nominate' || Route::currentRouteName() == 'voting') ? 'is-active' : '' }}">
-        <a href="@if($nominationExists){{ route('nominate') }}@elseif($votingExists){{ route('voting') }}@else#@endif">
+    <li class="{{ (Route::currentRouteName() == 'nominate' || Route::currentRouteName() == 'voting' || Route::currentRouteName() == 'jury') ? 'is-active' : '' }}">
+        <a href="@if($nominationExists){{ route('nominate') }}@elseif($votingExists){{ route('voting') }}@elseif($juryExists){{ route('jury') }}@else#@endif">
             <span class="icon is-small"><i class="fas fa-vote-yea" aria-hidden="true"></i></span>
             <span>
                 @if($nominationExists)
@@ -21,8 +21,8 @@
             </span>
         </a>
     </li>
-    <li class="{{ (Route::currentRouteName() == 'jury') ? 'is-active' : '' }}">
-        <a href="{{ route('jury') }}">
+    <li class="{{ (Route::currentRouteName() == 'jury-members') ? 'is-active' : '' }}">
+        <a href="{{ route('jury-members') }}">
             <span class="icon is-small"><i class="fas fa-users-cog" aria-hidden="true"></i></span>
             <span>Jury Members</span>
         </a>
