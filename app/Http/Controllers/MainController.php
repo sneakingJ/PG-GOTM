@@ -28,6 +28,7 @@ class MainController extends Component
     {
         $this->nominationExists = Month::where('status', MonthStatus::NOMINATING)->exists();
         $this->votingExists = Month::where('status', MonthStatus::VOTING)->exists();
+        $this->juryExists = Month::where('status', MonthStatus::JURY)->exists();
 
         return view('main');
     }

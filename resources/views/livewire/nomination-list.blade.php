@@ -1,10 +1,4 @@
 <div class="nomination-list">
-    <div class="columns is-centered">
-        <div class="column is-narrow">
-            <h1 class="title is-2">All current nominations</h1>
-        </div>
-    </div>
-
     <div class="box" wire:poll.10000ms>
         <div class="columns">
             <div class="column is-half">

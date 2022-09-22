@@ -30,7 +30,7 @@ class NominationList extends Component
         $user = session('auth');
         $this->userId = empty($user) ? 0 : $user['id'];
 
-        $monthId = Month::where('status', MonthStatus::NOMINATING)->first()->id;
+        $monthId = Month::where('status', MonthStatus::NOMINATING)->orWhere('status', MonthStatus::JURY)->first()->id;
 
         $this->shortNominations = Nomination::where('month_id', $monthId)->where('short', 1)->orderBy('created_at', 'desc')->get();
         $this->longNominations = Nomination::where('month_id', $monthId)->where('short', 0)->orderBy('created_at', 'desc')->get();
