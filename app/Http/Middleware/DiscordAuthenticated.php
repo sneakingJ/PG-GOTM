@@ -3,7 +3,9 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class DiscordAuthenticated
 {
@@ -11,10 +13,11 @@ class DiscordAuthenticated
      * Handle an incoming request.
      *
      * @param Request $request
-     * @param Closure(\Illuminate\Http\Request): (\Illuminate\Http\Response|\Illuminate\Http\RedirectResponse)  $next
-     * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
+     * @param Closure $next
+     * @param string $ids
+     * @return Response|RedirectResponse
      */
-    public function handle(Request $request, Closure $next): \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
+    public function handle(Request $request, Closure $next, string $ids): \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
     {
         $user = $request->session()->get('auth');
 
@@ -22,6 +25,10 @@ class DiscordAuthenticated
             $request->session()->put('url.intended', $request->url());
 
             return redirect()->route('login');
+        }
+
+        if (!empty($ids) && !in_array($user['id'], explode(',', $ids))) {
+            return redirect()->route('main');
         }
 
         return $next($request);

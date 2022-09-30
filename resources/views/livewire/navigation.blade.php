@@ -29,8 +29,16 @@
     </li>
     <li class="{{ (Route::currentRouteName() == 'privacy') ? 'is-active' : '' }}">
         <a href="{{ route('privacy') }}">
-            <span class="icon is-small"><i class="fas fa-lock" aria-hidden="true"></i></span>
+            <span class="icon is-small"><i class="fas fa-user-secret" aria-hidden="true"></i></span>
             <span>Privacy</span>
         </a>
     </li>
+    @if ($admin)
+        <li class="{{ (Route::currentRouteName() == 'admin') ? 'is-active' : '' }}">
+            <a href="{{ route('admin') }}">
+                <span class="icon is-small"><i class="fas fa-lock" aria-hidden="true"></i></span>
+                <span>Admin</span>
+            </a>
+        </li>
+    @endif
 </ul>
