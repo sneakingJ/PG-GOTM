@@ -1,9 +1,12 @@
-<div>
-    <h3>{{ $monthStatus->value }}</h3>
+<div class="content">
+    <h3>{{ ucfirst($monthStatus->value) }}</h3>
 
     @switch ($monthStatus)
+        @case (\App\Lib\MonthStatus::PLAYING)
+            @livewire('admin.playing', array('latestMonth' => $latestMonth))
+            @break
         @case (\App\Lib\MonthStatus::VOTING)
-            <button class="button" type="button" wire:click="votingToPlaying">Close Voting and start Playing</button>
+            @livewire('admin.voting', array('latestMonth' => $latestMonth))
             @break
         @default
             Nothing to do
