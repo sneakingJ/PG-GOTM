@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use Livewire\Component;
-use App\Models\JuryMember;
 
 /**
  *

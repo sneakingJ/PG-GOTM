@@ -27,6 +27,21 @@ class MainController extends Component
      */
     public bool $juryExists = false;
 
+    /**
+     * @var bool
+     */
+    public bool $playingExists = false;
+
+    /**
+     * @var int
+     */
+    public int $monthIdVoting = 1;
+
+    /**
+     * @var int
+     */
+    public int $monthIdPlaying = 1;
+
 
     /**
      * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
@@ -36,6 +51,14 @@ class MainController extends Component
         $this->nominationExists = Month::where('status', MonthStatus::NOMINATING)->exists();
         $this->votingExists = Month::where('status', MonthStatus::VOTING)->exists();
         $this->juryExists = Month::where('status', MonthStatus::JURY)->exists();
+        $this->playingExists = Month::where('status', MonthStatus::PLAYING)->exists();
+
+        if ($this->votingExists) {
+            $this->monthIdVoting = Month::where('status', MonthStatus::VOTING)->first()->id;
+        }
+        if ($this->playingExists) {
+            $this->monthIdPlaying = Month::where('status', MonthStatus::PLAYING)->first()->id;
+        }
 
         return view('main');
     }

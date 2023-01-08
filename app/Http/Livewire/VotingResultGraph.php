@@ -19,6 +19,11 @@ class VotingResultGraph extends Component
     public bool $short;
 
     /**
+     * @var int
+     */
+    public int $monthId;
+
+    /**
      * @var string
      */
     public string $categoryName;
@@ -56,10 +61,8 @@ class VotingResultGraph extends Component
      */
     private function fetchVotingResults(): array
     {
-        $monthId = Month::where('status', MonthStatus::VOTING)->first()->id;
-
-        $nominations = Nomination::where('month_id', $monthId)->where('jury_selected', true)->where('short', $this->short)->get();
-        $votes = Vote::where('month_id', $monthId)->where('short', $this->short)->get();
+        $nominations = Nomination::where('month_id', $this->monthId)->where('jury_selected', true)->where('short', $this->short)->get();
+        $votes = Vote::where('month_id', $this->monthId)->where('short', $this->short)->get();
         $totalAmountVotes = $votes->count();
 
         if ($totalAmountVotes === 0) {
@@ -136,7 +139,7 @@ class VotingResultGraph extends Component
         foreach ($results as $result) {
             $chartArray[] = array(addslashes($result[0]), addslashes($result[1]), $result[2]);
         }
-
+    
         return $chartArray;
     }
 }

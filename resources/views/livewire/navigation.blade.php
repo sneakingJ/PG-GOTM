@@ -5,18 +5,18 @@
             <span>Main</span>
         </a>
     </li>
-    <li class="{{ (Route::currentRouteName() == 'nominate' || Route::currentRouteName() == 'voting' || Route::currentRouteName() == 'jury') ? 'is-active' : '' }}">
-        <a href="@if($nominationExists){{ route('nominate') }}@elseif($votingExists){{ route('voting') }}@elseif($juryExists){{ route('jury') }}@else#@endif">
+    <li class="{{ (Route::currentRouteName() == 'nominate' || Route::currentRouteName() == 'voting' || Route::currentRouteName() == 'jury' || Route::currentRouteName() == 'history') ? 'is-active' : '' }}">
+        <a href="@if($nominationExists){{ route('nominate') }}@elseif($votingExists){{ route('voting') }}@elseif($juryExists){{ route('jury') }}@else{{ route('history') }}@endif">
             <span class="icon is-small"><i class="fas fa-vote-yea" aria-hidden="true"></i></span>
             <span>
                 @if($nominationExists)
                     Nominate
                 @elseif($juryExists)
-                    Jury at work
+                    Jury at Work
                 @elseif($votingExists)
                     Vote
                 @else
-                    Play the games!
+                    Past Months
                 @endif
             </span>
         </a>
