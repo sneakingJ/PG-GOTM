@@ -139,7 +139,7 @@ class VotingResultGraph extends Component
         foreach ($results as $result) {
             $chartArray[] = array(addslashes($result[0]), addslashes($result[1]), $result[2]);
         }
-    
+
         return $chartArray;
     }
 }

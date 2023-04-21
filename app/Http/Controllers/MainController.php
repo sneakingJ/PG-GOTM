@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Lib\MonthStatus;
-use App\Models\JuryMember;
 use App\Models\Month;
 use Livewire\Component;
 

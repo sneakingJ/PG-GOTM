@@ -29,9 +29,9 @@
                                     <div class="media-content">
                                         <p class="title is-4">{{ $result['Title'] }}</p>
                                         <p class="subtitle is-size-5">
-                                            Main Story: {{ $result['Time']['Main Story'] ?? '' }}<br>
-                                            Main + Extra: {{ $result['Time']['Main + Extra'] ?? '' }}<br>
-                                            Completionist: {{ $result['Time']['Completionist'] ?? '' }}<br>
+                                            Main Story: {{ $result['Summary']['Main Story'] ?? '' }}<br>
+                                            Main + Extra: {{ $result['Summary']['Main + Extra'] ?? '' }}<br>
+                                            Completionist: {{ $result['Summary']['Completionist'] ?? '' }}<br>
                                         </p>
                                     </div>
                                 </div>
