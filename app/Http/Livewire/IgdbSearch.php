@@ -60,10 +60,7 @@ class IgdbSearch extends Component
 
         $searchTerm = trim(Str::limit($this->searchName, 50));
         if (Str::length($searchTerm) >= 3) {
-            $searchQuery = Game::where(function ($query) use ($searchTerm) {
-                $query->whereLike('name', $searchTerm, false)
-                    ->orWhereLike('alternative_names.name', $searchTerm, false);
-            });
+            $searchQuery = Game::search($searchTerm);
 
             if (!empty($this->searchYear) && strlen($this->searchYear) == 4) {
                 $searchQuery->whereYear('first_release_date', trim($this->searchYear));
