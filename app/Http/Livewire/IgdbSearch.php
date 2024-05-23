@@ -50,7 +50,10 @@ class IgdbSearch extends Component
      */
     public function render(): \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Contracts\Foundation\Application
     {
-        $this->monthId = Month::where('status', MonthStatus::NOMINATING)->first()->id;
+        // Cache the month ID to avoid repeated queries
+        $this->monthId = cache()->remember('nominating_month_id', 3600, function () {
+            return Month::where('status', MonthStatus::NOMINATING)->first()->id;
+        });
 
         $this->noResults = false;
         $this->games = array();
@@ -58,14 +61,15 @@ class IgdbSearch extends Component
         $searchTerm = trim(Str::limit($this->searchName, 50));
         if (Str::length($searchTerm) >= 3) {
             $searchQuery = Game::where(function ($query) use ($searchTerm) {
-                $query->whereLike('name', $searchTerm, false)->orWhereLike('alternative_names.name', $searchTerm, false);
+                $query->whereLike('name', $searchTerm, false)
+                    ->orWhereLike('alternative_names.name', $searchTerm, false);
             });
 
             if (!empty($this->searchYear) && strlen($this->searchYear) == 4) {
                 $searchQuery->whereYear('first_release_date', trim($this->searchYear));
             }
 
-            $gameList = $this->processResult($searchQuery->with(['cover'])->all());
+            $gameList = $this->processResult($searchQuery->with(['cover'])->get());
 
             $this->games = array_slice($gameList, 0, 20, true);
         }
