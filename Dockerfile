@@ -20,6 +20,12 @@ RUN apt-get update && apt-get install -y \
 
 COPY --from=build /usr/src/app /var/www/html
 
+RUN php ./artisan key:generate && \
+    php ./artisan view:cache && \
+    php ./artisan route:cache && \
+    php ./artisan config:cache && \
+    php ./artisan storage:link
+
 WORKDIR /var/www/html
 
 EXPOSE 9000
