@@ -16,7 +16,10 @@
             }
         }
 
-        google.charts.load('current', {'packages': ['sankey']});
+        google.charts.load('current', {
+            'packages': ['sankey']
+        });
+        google.charts.setOnLoadCallback(drawChart);
     </script>
     <div>
         @livewire('voting-result-graph', array('short' => false, 'monthId' => $monthId))

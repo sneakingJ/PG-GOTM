@@ -12,9 +12,15 @@
             data.addColumn('number', 'Votes');
             data.addRows({!! json_encode($results) !!});
 
-            // Instantiates and draws our chart, passing in some options.
-            var chart = new google.visualization.Sankey(document.getElementById('{{ $categoryName }}-sankey'));
+            var container = document.getElementById('{{ $categoryName }}-sankey');
+
+            var width = container.clientWidth;
+            var height = container.clientHeight || 400;
+
+            var chart = new google.visualization.Sankey(container);
             chart.draw(data, options);
+
+            console.debug('Chart drawn with dimensions:', width, height);
         }
 
         window.addEventListener('DOMContentLoaded', event => {
@@ -24,5 +30,7 @@
         window.addEventListener('polled', event => {
             drawChart{{ $categoryName }}();
         });
+
+        window.addEventListener('resize', drawChart{{ $categoryName }});
     </script>
 </div>
