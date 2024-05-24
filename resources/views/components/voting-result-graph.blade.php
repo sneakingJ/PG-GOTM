@@ -44,8 +44,6 @@
 
             var chart = new google.visualization.Sankey(container);
             chart.draw(data, options);
-
-            console.debug('Chart drawn with dimensions:', width, height);
         }
 
         window.addEventListener('DOMContentLoaded', event => {
