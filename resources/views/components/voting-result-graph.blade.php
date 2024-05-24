@@ -5,6 +5,9 @@
         No votes yet!
     @endempty
     <script type="text/javascript">
+        google.charts.load('current', { packages: ['sankey'] });
+        google.charts.setOnLoadCallback(drawChart{{ $categoryName }});
+
         function drawChart{{ $categoryName }}() {
             var data = new google.visualization.DataTable();
             data.addColumn('string', 'From');
