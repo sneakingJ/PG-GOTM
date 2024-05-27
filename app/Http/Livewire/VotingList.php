@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Livewire\Component;
 use App\Models\Nomination;
 use App\Models\Vote;
+use App\Models\Ranking;
 use Illuminate\Support\Facades\Cookie;
 
 /**
@@ -119,20 +120,23 @@ class VotingList extends Component
      */
     public function saveVote(bool $short): void
     {
-        $vote = Vote::where('month_id', $this->monthId)->where('discord_id', $this->userId)->where('short', $short)->first();
-
-        if (empty($vote)) {
-            $vote = new Vote();
-            $vote->month_id = $this->monthId;
-            $vote->discord_id = $this->userId;
-            $vote->short = $short;
-        }
-
-        $vote->rank_1 = $this->currentOrder[$short][0];
-        $vote->rank_2 = $this->currentOrder[$short][1];
-        $vote->rank_3 = $this->currentOrder[$short][2];
+        $vote = Vote::firstOrNew([
+            'month_id' => $this->monthId,
+            'discord_id' => $this->userId,
+            'short' => $short
+        ]);
 
         $vote->save();
+
+        Ranking::where('vote_id', $vote->id)->delete();
+
+        foreach ($this->currentOrder[$short] as $rank => $nominationId) {
+            Ranking::create([
+                'vote_id' => $vote->id,
+                'nomination_id' => $nominationId,
+                'rank' => $rank + 1,
+            ]);
+        }
 
         $this->emitTo('vote-status', 'setVoted', true);
     }
@@ -146,6 +150,7 @@ class VotingList extends Component
         $vote = Vote::where('month_id', $this->monthId)->where('discord_id', $this->userId)->where('short', $short)->first();
 
         if (!empty($vote)) {
+            Ranking::where('vote_id', $vote->id)->delete();
             $vote->delete();
 
             $this->emitTo('vote-status', 'setVoted', false);
@@ -161,7 +166,12 @@ class VotingList extends Component
         $vote = Vote::where('discord_id', $this->userId)->where('month_id', $this->monthId)->where('short', $short)->first();
 
         if (!empty($this->currentOrder[(int)$short])) {
-            return new Collection([Nomination::find($this->currentOrder[(int)$short][0]), Nomination::find($this->currentOrder[(int)$short][1]), Nomination::find($this->currentOrder[(int)$short][2])]);
+            $nominations = Nomination::findMany($this->currentOrder[(int)$short]);
+            
+            // Maintain the new order of the nominations
+            return $nominations->sortBy(function ($nomination) use ($short) {
+                return array_search($nomination->id, $this->currentOrder[(int)$short]);
+            });
         }
 
         if (empty($vote)) {
@@ -170,7 +180,7 @@ class VotingList extends Component
             return $nominations;
         }
 
-        $this->currentOrder[(int)$short] = array($vote->rank_1, $vote->rank_2, $vote->rank_3);
-        return new Collection([Nomination::find($vote->rank_1), Nomination::find($vote->rank_2), Nomination::find($vote->rank_3)]);
+        $this->currentOrder[(int)$short] = $vote->rankings->sortBy('rank')->pluck('nomination_id')->toArray();
+        return Nomination::findMany($this->currentOrder[(int)$short]);
     }
 }
