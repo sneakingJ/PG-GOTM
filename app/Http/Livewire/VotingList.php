@@ -159,28 +159,61 @@ class VotingList extends Component
 
     /**
      * @param bool $short
+     * @param int $shortKey
+     * @return Collection
+     */
+    private function getOrderedNominations(array $order, int $shortKey): Collection
+    {
+        $nominations = Nomination::findMany($order);
+
+        return $nominations->sortBy(function ($nomination) use ($shortKey) {
+            return array_search($nomination->id, $this->currentOrder[$shortKey]);
+        });
+    }
+
+    /**
+     * @param int $shortKey
+     * @return Collection
+     */
+    private function getRandomNominations(int $shortKey): Collection
+    {
+        $nominations = Nomination::where('month_id', $this->monthId)
+            ->where('jury_selected', true)
+            ->where('short', $shortKey)
+            ->inRandomOrder()
+            ->get();
+
+        $this->currentOrder[$shortKey] = $nominations->pluck('id');
+
+        return $nominations;
+    }
+
+
+    /**
+     * @param bool $short
      * @return Collection
      */
     private function fetchNominations(bool $short): Collection
     {
-        $vote = Vote::where('discord_id', $this->userId)->where('month_id', $this->monthId)->where('short', $short)->first();
+        $vote = Vote::where('discord_id', $this->userId)
+            ->where('month_id', $this->monthId)
+            ->where('short', $short)
+            ->first();
 
-        if (!empty($this->currentOrder[(int)$short])) {
-            $nominations = Nomination::findMany($this->currentOrder[(int)$short]);
-            
-            // Maintain the new order of the nominations
-            return $nominations->sortBy(function ($nomination) use ($short) {
-                return array_search($nomination->id, $this->currentOrder[(int)$short]);
-            });
+        $shortKey = (int)$short;
+
+        if (!empty($this->currentOrder[$shortKey])) {
+            return $this->getOrderedNominations($this->currentOrder[$shortKey], $shortKey);
         }
 
         if (empty($vote)) {
-            $nominations = Nomination::where('month_id', $this->monthId)->where('jury_selected', true)->where('short', $short)->inRandomOrder()->get();
-            $this->currentOrder[(int)$short] = $nominations->pluck('id');
-            return $nominations;
+            return $this->getRandomNominations($shortKey);
         }
 
-        $this->currentOrder[(int)$short] = $vote->rankings->sortBy('rank')->pluck('nomination_id')->toArray();
-        return Nomination::findMany($this->currentOrder[(int)$short]);
+        $this->currentOrder[$shortKey] = $vote->rankings->sortBy('rank')->pluck('nomination_id')->toArray();
+
+        return $vote->rankings->sortBy('rank')->map(function ($ranking) {
+            return $ranking->nomination;
+        });
     }
 }
