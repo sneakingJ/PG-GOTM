@@ -3,7 +3,7 @@
 namespace App\Http\Livewire;
 
 use Livewire\Component;
-use IvanKayzer\HowLongToBeat\HowLongToBeat;
+use Askancy\HowLongToBeat\HowLongToBeat;
 
 /**
  *

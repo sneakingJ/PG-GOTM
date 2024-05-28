@@ -20,14 +20,14 @@
             var container = document.getElementById('{{ $categoryName }}-sankey');
 
             var width = container.clientWidth;
-            var height = Math.min(width * 0.75, 400);
-            
+            var height = 500;
+
             // Max font size of 16, min font size of 12, evolve linearly based on width
             var fontSize = Math.max(12, Math.min(16, width / 50));
 
             var options = {
                 height: height,
-                width: width,
+                width: Math.max(width, 1000), // Set a minimum width for the chart
                 sankey: {
                     node: {
                         label: {
@@ -35,9 +35,9 @@
                             fontSize: fontSize,
                             color: '#ffffff'
                         },
+                        width: 20,
                         nodePadding: 60,
                         labelPadding: 20,
-                        enableInteractivity: false
                     }
                 }
             }

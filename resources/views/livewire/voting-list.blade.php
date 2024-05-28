@@ -21,15 +21,11 @@
             </div>
             <div class="column is-narrow is-hidden-touch has-text-centered">
                 <h2 class="title is-3">&nbsp;</h2>
-                <div class="voting-number">
-                    1
-                </div>
-                <div class="voting-number">
-                    2
-                </div>
-                <div class="voting-number">
-                    3
-                </div>
+                @foreach($longNominations as $index => $nomination)
+                    <div class="voting-number">
+                        {{ $index + 1 }}
+                    </div>
+                @endforeach
                 <label class="checkbox mt-3"><input type="checkbox" wire:model="saveOnDrop"><br>Save on Drop</label>
             </div>
             <div class="column is-clearfix">

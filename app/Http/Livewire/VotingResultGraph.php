@@ -2,15 +2,10 @@
 
 namespace App\Http\Livewire;
 
-use App\Lib\MonthStatus;
-use App\Models\Month;
 use App\Models\Nomination;
 use App\Models\Vote;
 use Livewire\Component;
 
-/**
- *
- */
 class VotingResultGraph extends Component
 {
     /**
@@ -56,77 +51,148 @@ class VotingResultGraph extends Component
         $this->dispatchBrowserEvent('polled');
     }
 
-    /**
-     * @return array
-     */
     private function fetchVotingResults(): array
     {
-        $nominations = Nomination::where('month_id', $this->monthId)->where('jury_selected', true)->where('short', $this->short)->get();
-        $votes = Vote::where('month_id', $this->monthId)->where('short', $this->short)->get();
-        $totalAmountVotes = $votes->count();
-
-        if ($totalAmountVotes === 0) {
-            return array();
+        $nominations = Nomination::where('month_id', $this->monthId)
+            ->where('jury_selected', true)
+            ->where('short', $this->short)
+            ->get();
+        
+        $votes = Vote::where('month_id', $this->monthId)
+            ->where('short', $this->short)
+            ->with('rankings')
+            ->get();
+        
+        if ($votes->isEmpty()) {
+            return [];
         }
 
-        $voteCount = array();
+        $voteCount = $this->getCurrentVoteCount($votes, $nominations);
+
+        $nominationsWithVotes = $nominations->filter(function ($nomination) use ($voteCount) {
+            return $voteCount[$nomination->id] > 0;
+        });
+
+        if ($nominationsWithVotes->isEmpty()) {
+            return [];
+        }
+
+        return $this->runRounds($nominationsWithVotes, $votes);
+    }
+
+    /**
+     * Get the current vote count for each nomination where rank = 1
+     * @param $votes
+     * @return array
+     */
+    private function getCurrentVoteCount($votes, $nominations): array
+    {
+        $voteCount = $nominations->mapWithKeys(function ($nomination) {
+            return [$nomination->id => 0];
+        })->toArray();
+
+        foreach ($votes as $vote) {
+            $firstRanking = $vote->rankings->where('rank', 1)->first();
+            if ($firstRanking) {
+                $voteCount[$firstRanking->nomination_id]++;
+            }
+        }
+
+        return $voteCount;
+    }
+
+    private function getNextRankedNomination($vote, $remainingNominations)
+    {
+        $rankings = $vote->rankings->keyBy('rank');
+        while ($rankings->isNotEmpty()) {
+            $rankings->shift();
+            $rankings = $rankings->values()->map(function ($ranking, $index) {
+                $ranking->rank = $index + 1;
+                return $ranking;
+            });
+
+            if ($rankings->isNotEmpty()) {
+                $vote->rankings = $rankings;
+                $newTopChoice = $vote->rankings->first()->nomination_id;
+                $newTopChoiceNomination = $remainingNominations->find($newTopChoice);
+
+                if ($newTopChoiceNomination !== null) {
+                    return $newTopChoiceNomination;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private function runRounds($nominations, $votes): array
+    {
+        $voteFlow = [];
+        $currentVoteCount = $this->getCurrentVoteCount($votes, $nominations);
+
         foreach ($nominations as $nomination) {
-            $voteCount[$nomination->id] = Vote::where('rank_1', $nomination->id)->count();
+            $key = "{$nomination->game_name} ({$currentVoteCount[$nomination->id]})";
+            $voteFlow[$key] = [];
         }
 
-        $returnData = array();
+        while ($nominations->count() > 1) {
+            $loserKey = $nominations->pluck('id')->filter(function ($id) use ($currentVoteCount) {
+                return isset($currentVoteCount[$id]);
+            })->sort(function ($a, $b) use ($currentVoteCount) {
+                return $currentVoteCount[$a] <=> $currentVoteCount[$b];
+            })->first();
 
-        // Same amount of votes for all three games
-        if (count(array_flip($voteCount)) === 1) {
-            $amountVotes = $totalAmountVotes / count($voteCount);
-
-            return array(
-                [$nominations->first()->game_name . ' (' . $amountVotes . ')', $nominations->skip(1)->first()->game_name . ' (' . $amountVotes . ')', 1],
-                [$nominations->skip(1)->first()->game_name . ' (' . $amountVotes . ')', $nominations->last()->game_name . ' (' . $amountVotes . ')', 1]
-            );
-        }
-
-        $firstRoundWinnerKey = array_search(max($voteCount), $voteCount);
-
-        // One game has the majority of votes
-        if ($totalAmountVotes / max($voteCount) <= 2) {
-            $winner = $nominations->find($firstRoundWinnerKey);
-
-            foreach ($nominations as $fromNomination) {
-                $amountVotes = ($voteCount[$fromNomination->id] > 0) ? $voteCount[$fromNomination->id] : 0.1;
-
-                $returnData[] = [$fromNomination->game_name . ' (' . floor($amountVotes) . ')', $winner->game_name . ' (' . $totalAmountVotes . ') ', $amountVotes];
+            $loser = $nominations->find($loserKey);
+            if ($loser === null) {
+                break;
             }
 
-            return $returnData;
+            $remainingNominations = $nominations->except($loserKey);
+
+            $transferredVotes = [];
+            foreach ($votes as $vote) {
+                if ($vote->rankings->first()->nomination_id != $loserKey) {
+                    continue;
+                }
+
+                $newTopChoiceNomination = $this->getNextRankedNomination($vote, $remainingNominations);
+                if ($newTopChoiceNomination !== null) {
+                    $transferredVotes[$newTopChoiceNomination->id] = ($transferredVotes[$newTopChoiceNomination->id] ?? 0) + 1;
+                }
+            }
+
+            foreach ($transferredVotes as $nominationId => $votesTransferred) {
+                $nomination = $remainingNominations->find($nominationId);
+
+                if ($nomination !== null) {
+                    $currentVoteCountForWinner = $currentVoteCount[$nominationId] ?? 0;
+                    $currentVoteCountForLoser = $currentVoteCount[$loserKey] ?? 0;
+
+                    $currentVoteCount[$nominationId] += $votesTransferred;
+                    $newVoteCountForWinner = $currentVoteCount[$nominationId];
+
+                    $winnerSourceKey = "{$nomination->game_name} ({$currentVoteCountForWinner})";
+                    $loserSourceKey = "{$loser->game_name} ({$currentVoteCountForLoser})";
+                    $targetKey = "{$nomination->game_name} ({$newVoteCountForWinner})";
+
+                    $voteFlow[$winnerSourceKey][] = [$targetKey, $currentVoteCountForWinner];
+                    $voteFlow[$loserSourceKey][] = [$targetKey, $votesTransferred];
+                }
+            }
+
+            $nominations = $remainingNominations;
         }
 
-        // No majority but one clear loser
-        $loserId = array_search(min($voteCount), $voteCount);
-        $loser = $nominations->find($loserId);
-        $winners = $nominations->except($loserId);
-        $amountVotesTo = array();
-        foreach ($winners as $winner) {
-            $amountVotesFrom = $voteCount[$winner->id];
-            $amountGain = Vote::where('rank_1', $loserId)->where('rank_2', $winner->id)->count();
-            $amountVotesTo[$winner->id] = $amountVotesFrom + $amountGain;
-
-            $returnData[] = [$loser->game_name . ' (' . $voteCount[$loserId] . ')', $winner->game_name . ' (' . $amountVotesTo[$winner->id] . ') ', $amountGain];
-            $returnData[] = [$winner->game_name . ' (' . $amountVotesFrom . ')', $winner->game_name . ' (' . $amountVotesTo[$winner->id] . ') ', $amountVotesFrom];
+        $results = [];
+        foreach ($voteFlow as $source => $data) {
+            foreach ($data as $target) {
+                $results[] = [$source, $target[0], $target[1]];
+            }
         }
 
-        if ($amountVotesTo[$winners->first()->id] === $amountVotesTo[$winners->last()->id]) { // Tie in second round
-            $ultimateWinnerKey = $firstRoundWinnerKey;
-        } else {
-            $ultimateWinnerKey = array_search(max($amountVotesTo), $amountVotesTo);
-        }
-        $ultimateWinner = $nominations->find($ultimateWinnerKey);
-        foreach ($winners as $winner) {
-            $returnData[] = [$winner->game_name . ' (' . $amountVotesTo[$winner->id] . ') ', $ultimateWinner->game_name . ' (' . $totalAmountVotes . ')  ', $amountVotesTo[$winner->id]];
-        }
-
-        return $returnData;
+        return $results;
     }
+
 
     /**
      * @param array $results
@@ -134,12 +200,8 @@ class VotingResultGraph extends Component
      */
     private function prepareChartData(array $results): array
     {
-        $chartArray = array();
-
-        foreach ($results as $result) {
-            $chartArray[] = array(addslashes($result[0]), addslashes($result[1]), $result[2]);
-        }
-
-        return $chartArray;
+        return array_map(function ($result) {
+            return [addslashes($result[0]), addslashes($result[1]), $result[2]];
+        }, $results);
     }
 }
