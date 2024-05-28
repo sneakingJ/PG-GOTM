@@ -79,10 +79,15 @@
 }
 
 .sankey-container {
-    pointer-events: none;
-    width: 100%;
-    height: 400px;
-    position: relative;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    white-space: nowrap;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.sankey-container::-webkit-scrollbar {
+    display: none;
 }
 
 .nomination-list .pitch {
