@@ -24,3 +24,9 @@ This whole project is open source and the code can be inspected by everyone on G
 - artisan migrate (:fresh)
 - artisan gotm:importplatforms
 - artisan db:seed
+
+## Docker Container Installation
+- See [docker-compose.yml](docker-compose.yml) to set up your environment with [Laravel Sail](https://laravel.com/docs/8.x/sail)
+
+## Windows Local Installation
+- See [LOCAL_INSTALLATION.md](LOCAL_INSTALLATION.md) for details on setting up your environment locally in Windows
