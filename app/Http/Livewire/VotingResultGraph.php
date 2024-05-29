@@ -137,52 +137,59 @@ class VotingResultGraph extends Component
         }
 
         while ($nominations->count() > 1) {
-            $loserKey = $nominations->pluck('id')->filter(function ($id) use ($currentVoteCount) {
-                return isset($currentVoteCount[$id]);
-            })->sort(function ($a, $b) use ($currentVoteCount) {
-                return $currentVoteCount[$a] <=> $currentVoteCount[$b];
+            $maxRank = $nominations->count();
+            $rankWeights = array_reverse(range(1, $maxRank));
+
+            $nominationWeightedScores = $nominations->mapWithKeys(function ($nomination) use ($votes, $rankWeights) {
+                return [$nomination->id => $votes->sum(function ($vote) use ($nomination, $rankWeights) {
+                    $ranking = $vote->rankings->firstWhere('nomination_id', $nomination->id);
+                    return $ranking ? $rankWeights[$ranking->rank - 1] ?? 0 : 0;
+                })];
+            });
+
+            $loser = $nominations->sortBy(function ($nomination) use ($currentVoteCount, $nominationWeightedScores) {
+                return [$currentVoteCount[$nomination->id] ?? 0, $nominationWeightedScores[$nomination->id]];
             })->first();
 
-            $loser = $nominations->find($loserKey);
             if ($loser === null) {
                 break;
             }
 
+            $loserKey = $loser->id;
             $remainingNominations = $nominations->except($loserKey);
 
-            $transferredVotes = [];
-            foreach ($votes as $vote) {
-                if ($vote->rankings->isEmpty()) {
-                    continue;
-                }
+            $transferredVotes = collect();
+            $eliminatedVotes = collect();
 
-                if ($vote->rankings->first()->nomination_id != $loserKey) {
-                    continue;
+            $votes->each(function ($vote) use ($loserKey, $remainingNominations, &$transferredVotes, &$eliminatedVotes) {
+                if ($vote->rankings->isEmpty() || $vote->rankings->first()->nomination_id != $loserKey) {
+                    return;
                 }
 
                 $newTopChoiceNomination = $this->getNextRankedNomination($vote, $remainingNominations);
                 if ($newTopChoiceNomination !== null) {
-                    $transferredVotes[$newTopChoiceNomination->id] = ($transferredVotes[$newTopChoiceNomination->id] ?? 0) + 1;
+                    $transferredVotes->put($newTopChoiceNomination->id, $transferredVotes->get($newTopChoiceNomination->id, 0) + 1);
+                } else {
+                    $eliminatedVotes->push($vote);
                 }
-            }
+            });
 
-            foreach ($transferredVotes as $nominationId => $votesTransferred) {
+            $transferredVotes->each(function ($votesTransferred, $nominationId) use (&$currentVoteCount, $remainingNominations, &$voteFlow, $loser) {
                 $nomination = $remainingNominations->find($nominationId);
-
                 if ($nomination !== null) {
                     $currentVoteCountForWinner = $currentVoteCount[$nominationId] ?? 0;
-                    $currentVoteCountForLoser = $currentVoteCount[$loserKey] ?? 0;
+                    $currentVoteCountForLoser = $currentVoteCount[$loser->id] ?? 0;
 
                     $currentVoteCount[$nominationId] += $votesTransferred;
                     $newVoteCountForWinner = $currentVoteCount[$nominationId];
 
-                    $winnerSourceKey = "{$nomination->game_name} ({$currentVoteCountForWinner})";
-                    $loserSourceKey = "{$loser->game_name} ({$currentVoteCountForLoser})";
-                    $targetKey = "{$nomination->game_name} ({$newVoteCountForWinner})";
-
-                    $voteFlow[$winnerSourceKey][] = [$targetKey, $currentVoteCountForWinner];
-                    $voteFlow[$loserSourceKey][] = [$targetKey, $votesTransferred];
+                    $voteFlow["{$nomination->game_name} ({$currentVoteCountForWinner})"][] = ["{$nomination->game_name} ({$newVoteCountForWinner})", $currentVoteCountForWinner];
+                    $voteFlow["{$loser->game_name} ({$currentVoteCountForLoser})"][] = ["{$nomination->game_name} ({$newVoteCountForWinner})", $votesTransferred];
                 }
+            });
+
+            if ($eliminatedVotes->isNotEmpty()) {
+                $voteFlow["{$loser->game_name} ({$currentVoteCount[$loserKey]})"][] = ["Eliminated", $eliminatedVotes->count()];
             }
 
             $nominations = $remainingNominations;
