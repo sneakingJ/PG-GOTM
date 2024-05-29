@@ -8353,3 +8353,15 @@ readers do not read off random characters that represent icons */
     border-radius: 5px;
 }
 
+.buttons-container {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+.buttons-container .button {
+    flex: 1;
+    margin: 0 5px;
+}
+
+
