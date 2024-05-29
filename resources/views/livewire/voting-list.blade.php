@@ -12,30 +12,95 @@
         <div class="columns">
             <div class="column is-clearfix">
                 <h2 class="title is-3">Long Games</h2>
+                @php
+                    $currentOrderLong = is_array($currentOrder[0]) ? $currentOrder[0] : $currentOrder[0]->toArray();
+                    $dividerIndex = array_search($divider, $currentOrderLong);
+                    $rankedGames = array_slice($currentOrderLong, 0, $dividerIndex);
+                    $unrankedGames = array_slice($currentOrderLong, $dividerIndex + 1);
+                @endphp
                 <x-laravel-blade-sortable::sortable group="long" name="long" :allow-drop="false" wire:onSortOrderChange="sortChange">
-                    @each('livewire.cards.nominations-list-card', $longNominations, 'nomination')
+                    @if(empty($rankedGames))
+                        <div class="card mb-4">
+                            <div class="card-content">
+                                <div class="content has-text-centered">
+                                    Drag games here to rank them
+                                </div>
+                            </div>
+                        </div>
+                    @else
+                        @foreach($rankedGames as $item)
+                            <x-laravel-blade-sortable::sortable-item sort-key="{{ $item }}">
+                                @include('livewire.cards.votings-list-card', ['nomination' => \App\Models\Nomination::find($item), 'currentOrder' => $currentOrderLong, 'divider' => $divider, 'short' => 0])
+                            </x-laravel-blade-sortable::sortable-item>
+                        @endforeach
+                    @endif
+
+                    <x-laravel-blade-sortable::sortable-item sort-key="{{ $divider }}">
+                        @include('livewire.cards.divider-card')
+                    </x-laravel-blade-sortable::sortable-item>
+
+                    @if(empty($unrankedGames))
+                        <div class="card mb-4">
+                            <div class="card-content">
+                                <div class="content has-text-centered">
+                                    Drag games here to unrank them
+                                </div>
+                            </div>
+                        </div>
+                    @else
+                        @foreach($unrankedGames as $item)
+                            <x-laravel-blade-sortable::sortable-item sort-key="{{ $item }}">
+                                @include('livewire.cards.votings-list-card', ['nomination' => \App\Models\Nomination::find($item), 'currentOrder' => $currentOrderLong, 'divider' => $divider, 'short' => 0])
+                            </x-laravel-blade-sortable::sortable-item>
+                        @endforeach
+                    @endif
                 </x-laravel-blade-sortable::sortable>
-                <button class="button is-pulled-left" type="button" wire:click="$emitTo('voting-list', 'saveVote', false)">Save Long</button>
-                @if($votedLong)<button class="button is-pulled-left ml-4" type="button" wire:click="$emitTo('voting-list', 'deleteVote', false)">Unvote Long</button>@endif
-                @livewire('vote-status', array('short' => false))
-            </div>
-            <div class="column is-narrow is-hidden-touch has-text-centered">
-                <h2 class="title is-3">&nbsp;</h2>
-                @foreach($longNominations as $index => $nomination)
-                    <div class="voting-number">
-                        {{ $index + 1 }}
-                    </div>
-                @endforeach
-                <label class="checkbox mt-3"><input type="checkbox" wire:model="saveOnDrop"><br>Save on Drop</label>
             </div>
             <div class="column is-clearfix">
                 <h2 class="title is-3">Short Games</h2>
+                @php
+                    $currentOrderShort = is_array($currentOrder[1]) ? $currentOrder[1] : $currentOrder[1]->toArray();
+                    $dividerIndex = array_search($divider, $currentOrderShort);
+                    $rankedGames = array_slice($currentOrderShort, 0, $dividerIndex);
+                    $unrankedGames = array_slice($currentOrderShort, $dividerIndex + 1);
+                @endphp
                 <x-laravel-blade-sortable::sortable group="short" name="short" :allow-drop="false" wire:onSortOrderChange="sortChange">
-                    @each('livewire.cards.nominations-list-card', $shortNominations, 'nomination')
+                    @if(empty($rankedGames))
+                        <div class="card mb-4">
+                            <div class="card-content">
+                                <div class="content has-text-centered">
+                                    Drag games here to rank them
+                                </div>
+                            </div>
+                        </div>
+                    @else
+                        @foreach($rankedGames as $item)
+                            <x-laravel-blade-sortable::sortable-item sort-key="{{ $item }}">
+                                @include('livewire.cards.votings-list-card', ['nomination' => \App\Models\Nomination::find($item), 'currentOrder' => $currentOrderShort, 'divider' => $divider, 'short' => 1])
+                            </x-laravel-blade-sortable::sortable-item>
+                        @endforeach
+                    @endif
+
+                    <x-laravel-blade-sortable::sortable-item sort-key="{{ $divider }}">
+                        @include('livewire.cards.divider-card')
+                    </x-laravel-blade-sortable::sortable-item>
+
+                    @if(empty($unrankedGames))
+                        <div class="card mb-4">
+                            <div class="card-content">
+                                <div class="content has-text-centered">
+                                    Drag games here to unrank them
+                                </div>
+                            </div>
+                        </div>
+                    @else
+                        @foreach($unrankedGames as $item)
+                            <x-laravel-blade-sortable::sortable-item sort-key="{{ $item }}">
+                                @include('livewire.cards.votings-list-card', ['nomination' => \App\Models\Nomination::find($item), 'currentOrder' => $currentOrderShort, 'divider' => $divider, 'short' => 1])
+                            </x-laravel-blade-sortable::sortable-item>
+                        @endforeach
+                    @endif
                 </x-laravel-blade-sortable::sortable>
-                <button class="button is-pulled-left" type="button" wire:click="$emitTo('voting-list', 'saveVote', true)">Save Short</button>
-                @if($votedShort)<button class="button is-pulled-left ml-4" type="button" wire:click="$emitTo('voting-list', 'deleteVote', true)">Unvote Short</button>@endif
-                @livewire('vote-status', array('short' => true))
             </div>
         </div>
     </div>

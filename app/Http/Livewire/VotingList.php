@@ -54,7 +54,7 @@ class VotingList extends Component
     /**
      * @var bool
      */
-    public bool $saveOnDrop = false;
+    public bool $saveOnDrop = true;
 
     /**
      * @var array
@@ -62,11 +62,16 @@ class VotingList extends Component
     public array $currentOrder = array();
 
     /**
+     * @var string
+     */
+    public string $divider = 'divider';
+
+    /**
      * @return void
      */
     public function boot(): void
     {
-        $this->saveOnDrop = Cookie::get('saveOnDrop') ?? false;
+        $this->saveOnDrop = true;
     }
 
     /**
@@ -89,14 +94,6 @@ class VotingList extends Component
     }
 
     /**
-     * @return void
-     */
-    public function updatingSaveOnDrop($value, $key): void
-    {
-        Cookie::queue('saveOnDrop', $value, 525960);
-    }
-
-    /**
      * @param $sortOrder
      * @param $previousSortOrder
      * @param string $name
@@ -108,6 +105,32 @@ class VotingList extends Component
     {
         $short = ($name === 'short') ? 1 : 0;
         $this->currentOrder[$short] = $sortOrder;
+
+        if ($this->saveOnDrop) {
+            $this->saveVote($short);
+        }
+    }
+
+    /**
+     * Button to instantly shift game from ranked / unranked sides of the collection
+     */
+    public function moveNomination($nominationId, $short): void
+    {
+        $shortKey = (int)$short;
+        $currentOrder = $this->currentOrder[$shortKey];
+        $dividerIndex = array_search($this->divider, $currentOrder);
+
+        if (in_array($nominationId, array_slice($currentOrder, 0, $dividerIndex))) {
+            // Move to unranked
+            $rankedGames = array_diff(array_slice($currentOrder, 0, $dividerIndex), [$nominationId]);
+            $unrankedGames = array_merge([$nominationId], array_slice($currentOrder, $dividerIndex + 1));
+        } else {
+            // Move to ranked
+            $rankedGames = array_merge(array_slice($currentOrder, 0, $dividerIndex), [$nominationId]);
+            $unrankedGames = array_diff(array_slice($currentOrder, $dividerIndex + 1), [$nominationId]);
+        }
+
+        $this->currentOrder[$shortKey] = array_merge($rankedGames, [$this->divider], $unrankedGames);
 
         if ($this->saveOnDrop) {
             $this->saveVote($short);
@@ -131,6 +154,10 @@ class VotingList extends Component
         Ranking::where('vote_id', $vote->id)->delete();
 
         foreach ($this->currentOrder[$short] as $rank => $nominationId) {
+            if ($nominationId == $this->divider) {
+                break;
+            }
+
             Ranking::create([
                 'vote_id' => $vote->id,
                 'nomination_id' => $nominationId,
@@ -184,6 +211,7 @@ class VotingList extends Component
             ->get();
 
         $this->currentOrder[$shortKey] = $nominations->pluck('id');
+        $this->currentOrder[$shortKey]->prepend($this->divider);
 
         return $nominations;
     }
@@ -210,10 +238,15 @@ class VotingList extends Component
             return $this->getRandomNominations($shortKey);
         }
 
-        $this->currentOrder[$shortKey] = $vote->rankings->sortBy('rank')->pluck('nomination_id')->toArray();
+        $rankedNominations = $vote->rankings->sortBy('rank')->pluck('nomination_id')->toArray();
+        $unrankedNominations = Nomination::where('month_id', $this->monthId)
+            ->where('short', $short)
+            ->whereNotIn('id', $rankedNominations)
+            ->inRandomOrder()
+            ->pluck('id')
+            ->toArray();
 
-        return $vote->rankings->sortBy('rank')->map(function ($ranking) {
-            return $ranking->nomination;
-        });
+        $this->currentOrder[$shortKey] = array_merge($rankedNominations, [$this->divider], $unrankedNominations);
+        return Nomination::findMany(array_merge($rankedNominations, $unrankedNominations));
     }
 }
