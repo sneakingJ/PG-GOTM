@@ -86,6 +86,7 @@ class VotingResultGraph extends Component
     /**
      * Get the current vote count for each nomination where rank = 1
      * @param $votes
+     * @param $nominations
      * @return array
      */
     private function getCurrentVoteCount($votes, $nominations): array
@@ -221,6 +222,13 @@ class VotingResultGraph extends Component
                 $targetGameName . ' (' . $target->getAttribute('votes') . ")" . str_repeat(' ', $targetRoundNumber),
                 $weight
             ];
+        }
+
+        // If $result is empty but voteFlow is not that means we have a tie
+        if (empty($results) && !empty($voteFlow)) {
+            foreach ($voteFlow as $source => $data) {
+                $results[] = [$source, 'Tie', 1];
+            }
         }
 
         return $results;
