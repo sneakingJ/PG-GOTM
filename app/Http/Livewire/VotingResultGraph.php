@@ -168,17 +168,21 @@ class VotingResultGraph extends Component
             $loserKey = $loser->id;
             $remainingNominations = $nominations->except($loserKey);
 
-            $transferredVotes = [];
+            $transferredVotes = collect();
             foreach ($votes as $vote) {
-                if ($vote->rankings->count() > 0 && $vote->rankings->first()->nomination_id != $loserKey) {
+                if ($vote->rankings->isEmpty()) {
+                    continue;
+                }
+
+                if ($vote->rankings->first()->nomination_id != $loserKey) {
                     continue;
                 }
 
                 $newTopChoiceNomination = $this->getNextRankedNomination($vote, $remainingNominations);
                 if ($newTopChoiceNomination !== null) {
-                    $transferredVotes[$newTopChoiceNomination->id] = ($transferredVotes[$newTopChoiceNomination->id] ?? 0) + 1;
+                    $transferredVotes->put($newTopChoiceNomination->id, $transferredVotes->get($newTopChoiceNomination->id, 0) + 1);
                 }
-            }
+            };
 
             foreach ($remainingNominations as $nomination) {
                 $winnerId = $nomination->id;
