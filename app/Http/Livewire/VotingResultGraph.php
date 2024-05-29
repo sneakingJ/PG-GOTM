@@ -57,12 +57,12 @@ class VotingResultGraph extends Component
             ->where('jury_selected', true)
             ->where('short', $this->short)
             ->get();
-        
+
         $votes = Vote::where('month_id', $this->monthId)
             ->where('short', $this->short)
             ->with('rankings')
             ->get();
-        
+
         if ($votes->isEmpty()) {
             return [];
         }
@@ -83,6 +83,7 @@ class VotingResultGraph extends Component
     /**
      * Get the current vote count for each nomination where rank = 1
      * @param $votes
+     * @param $nominations
      * @return array
      */
     private function getCurrentVoteCount($votes, $nominations): array
@@ -151,6 +152,10 @@ class VotingResultGraph extends Component
 
             $transferredVotes = [];
             foreach ($votes as $vote) {
+                if ($vote->rankings->isEmpty()) {
+                    continue;
+                }
+
                 if ($vote->rankings->first()->nomination_id != $loserKey) {
                     continue;
                 }
@@ -187,6 +192,13 @@ class VotingResultGraph extends Component
         foreach ($voteFlow as $source => $data) {
             foreach ($data as $target) {
                 $results[] = [$source, $target[0], $target[1]];
+            }
+        }
+
+        // If $result is empty but voteFlow is not that means we have a tie
+        if (empty($results) && !empty($voteFlow)) {
+            foreach ($voteFlow as $source => $data) {
+                $results[] = [$source, 'Tie', 1];
             }
         }
 
