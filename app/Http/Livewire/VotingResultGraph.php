@@ -104,10 +104,22 @@ class VotingResultGraph extends Component
 
     private function getNextRankedNomination($vote, $remainingNominations)
     {
-        foreach ($vote->rankings as $ranking) {
-            $nominationId = $ranking->nomination_id;
-            if ($remainingNominations->contains('id', $nominationId)) {
-                return $remainingNominations->firstWhere('id', $nominationId);
+        $rankings = $vote->rankings->keyBy('rank');
+        while ($rankings->isNotEmpty()) {
+            $rankings->shift();
+            $rankings = $rankings->values()->map(function ($ranking, $index) {
+                $ranking->rank = $index + 1;
+                return $ranking;
+            });
+
+            if ($rankings->isNotEmpty()) {
+                $vote->rankings = $rankings;
+                $newTopChoice = $vote->rankings->first()->nomination_id;
+                $newTopChoiceNomination = $remainingNominations->find($newTopChoice);
+
+                if ($newTopChoiceNomination !== null) {
+                    return $newTopChoiceNomination;
+                }
             }
         }
 
@@ -139,22 +151,16 @@ class VotingResultGraph extends Component
 
         while ($nominations->count() > 1) {
             $currentVoteCount = $this->getCurrentVoteCount($votes, $originalNominations);
-            $lowestVoteCount = min($currentVoteCount);
-            $potentialLosers = $nominations->filter(function ($nomination) use ($currentVoteCount, $lowestVoteCount) {
-                return $currentVoteCount[$nomination->id] === $lowestVoteCount;
+
+            // Sort all nominations by their vote count, then by their weighted score
+            $potentialLosers = $nominations->sortByDesc(function ($nomination) use ($currentVoteCount, $nominationWeightedScores) {
+                return [$currentVoteCount[$nomination->id], $nominationWeightedScores[$nomination->id]];
             });
 
-            if ($potentialLosers->count() === $nominations->count()) {
-                $potentialLosers = $potentialLosers->sortByDesc(function ($nomination) use ($nominationWeightedScores) {
-                    return $nominationWeightedScores[$nomination->id];
-                });
-            }
-            $loser = $potentialLosers->first();
-
+            $loser = $potentialLosers->last();
             if ($loser === null) {
                 break;
             }
-
             $loserKey = $loser->id;
             $remainingNominations = $nominations->except($loserKey);
 
