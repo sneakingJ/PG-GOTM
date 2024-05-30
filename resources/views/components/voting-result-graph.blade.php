@@ -20,7 +20,7 @@
             var container = document.getElementById('{{ $categoryName }}-sankey');
 
             var width = container.clientWidth;
-            var height = 500;
+            var height = 600;
 
             // Max font size of 16, min font size of 12, evolve linearly based on width
             var fontSize = Math.max(12, Math.min(16, width / 50));
