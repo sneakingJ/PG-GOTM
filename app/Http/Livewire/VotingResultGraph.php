@@ -57,12 +57,12 @@ class VotingResultGraph extends Component
             ->where('jury_selected', true)
             ->where('short', $this->short)
             ->get();
-        
+
         $votes = Vote::where('month_id', $this->monthId)
             ->where('short', $this->short)
             ->with('rankings')
             ->get();
-        
+
         if ($votes->isEmpty()) {
             return [];
         }
@@ -128,6 +128,7 @@ class VotingResultGraph extends Component
     private function runRounds($nominations, $votes): array
     {
         $voteFlow = [];
+        $originalNominations = $nominations;
         $currentVoteCount = $this->getCurrentVoteCount($votes, $nominations);
 
         foreach ($nominations as $nomination) {
@@ -135,23 +136,37 @@ class VotingResultGraph extends Component
             $voteFlow[$key] = [];
         }
 
-        while ($nominations->count() > 1) {
-            $loserKey = $nominations->pluck('id')->filter(function ($id) use ($currentVoteCount) {
-                return isset($currentVoteCount[$id]);
-            })->sort(function ($a, $b) use ($currentVoteCount) {
-                return $currentVoteCount[$a] <=> $currentVoteCount[$b];
-            })->first();
+        $maxRank = $nominations->count();
+        $rankWeights = array_reverse(range(1, $maxRank));
 
-            $loser = $nominations->find($loserKey);
+        $nominationWeightedScores = $nominations->mapWithKeys(function ($nomination) use ($votes, $rankWeights) {
+            $weightedScore = $votes->sum(function ($vote) use ($nomination, $rankWeights) {
+                $ranking = $vote->rankings->firstWhere('nomination_id', $nomination->id);
+                return $ranking ? $rankWeights[$ranking->rank - 1] ?? 0 : 0;
+            });
+
+            return [$nomination->id => $weightedScore];
+        });
+
+        while ($nominations->count() > 1) {
+            $currentVoteCount = $this->getCurrentVoteCount($votes, $originalNominations);
+
+            // Sort all nominations by their vote count, then by their weighted score
+            $potentialLosers = $nominations->sortByDesc(function ($nomination) use ($currentVoteCount, $nominationWeightedScores) {
+                return [$currentVoteCount[$nomination->id], $nominationWeightedScores[$nomination->id]];
+            });
+
+            $loser = $potentialLosers->last();
             if ($loser === null) {
                 break;
             }
 
+            $loserKey = $loser->id;
             $remainingNominations = $nominations->except($loserKey);
 
             $transferredVotes = [];
             foreach ($votes as $vote) {
-                if ($vote->rankings->first()->nomination_id != $loserKey) {
+                if ($vote->rankings->count() > 0 && $vote->rankings->first()->nomination_id != $loserKey) {
                     continue;
                 }
 
