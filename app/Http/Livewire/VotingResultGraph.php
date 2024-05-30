@@ -104,22 +104,10 @@ class VotingResultGraph extends Component
 
     private function getNextRankedNomination($vote, $remainingNominations)
     {
-        $rankings = $vote->rankings->keyBy('rank');
-        while ($rankings->isNotEmpty()) {
-            $rankings->shift();
-            $rankings = $rankings->values()->map(function ($ranking, $index) {
-                $ranking->rank = $index + 1;
-                return $ranking;
-            });
-
-            if ($rankings->isNotEmpty()) {
-                $vote->rankings = $rankings;
-                $newTopChoice = $vote->rankings->first()->nomination_id;
-                $newTopChoiceNomination = $remainingNominations->find($newTopChoice);
-
-                if ($newTopChoiceNomination !== null) {
-                    return $newTopChoiceNomination;
-                }
+        foreach ($vote->rankings as $ranking) {
+            $nominationId = $ranking->nomination_id;
+            if ($remainingNominations->contains('id', $nominationId)) {
+                return $remainingNominations->firstWhere('id', $nominationId);
             }
         }
 
@@ -136,15 +124,22 @@ class VotingResultGraph extends Component
             $voteFlow[$key] = [];
         }
 
-        while ($nominations->count() > 1) {
-            $maxRank = $nominations->count();
-            $rankWeights = array_reverse(range(1, $maxRank));
+        $maxRank = $nominations->count();
+        $rankWeights = array_reverse(range(1, $maxRank));
 
-            $nominationWeightedScores = $nominations->mapWithKeys(function ($nomination) use ($votes, $rankWeights) {
-                return [$nomination->id => $votes->sum(function ($vote) use ($nomination, $rankWeights) {
+        while ($nominations->count() > 1) {
+            $nominationWeightedScores = $nominations->mapWithKeys(function ($nomination) use ($votes, $rankWeights, &$csvData) {
+                $weightedScore = $votes->sum(function ($vote) use ($nomination, $rankWeights) {
                     $ranking = $vote->rankings->firstWhere('nomination_id', $nomination->id);
                     return $ranking ? $rankWeights[$ranking->rank - 1] ?? 0 : 0;
-                })];
+                });
+
+                $rankings = $votes->map(function ($vote) use ($nomination) {
+                    $ranking = $vote->rankings->firstWhere('nomination_id', $nomination->id);
+                    return $ranking ? $ranking->rank : '';
+                })->implode(', ');
+
+                return [$nomination->id => $weightedScore];
             });
 
             $loser = $nominations->sortBy(function ($nomination) use ($currentVoteCount, $nominationWeightedScores) {
