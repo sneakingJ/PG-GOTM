@@ -143,7 +143,6 @@ class VotingResultGraph extends Component
         });
 
         while ($nominations->count() > 1) {
-
             $potentialLosers = $nominations->sortByDesc(function ($nomination) use ($currentVoteCount, $nominationWeightedScores) {
                 return [$currentVoteCount[$nomination->id], $nominationWeightedScores[$nomination->id]];
             });
