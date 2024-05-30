@@ -127,7 +127,7 @@ class VotingResultGraph extends Component
         $maxRank = $nominations->count();
         $rankWeights = array_reverse(range(1, $maxRank));
 
-        $nominationWeightedScores = $nominations->mapWithKeys(function ($nomination) use ($votes, $rankWeights, &$csvData) {
+        $nominationWeightedScores = $nominations->mapWithKeys(function ($nomination) use ($votes, $rankWeights) {
             $weightedScore = $votes->sum(function ($vote) use ($nomination, $rankWeights) {
                 $ranking = $vote->rankings->firstWhere('nomination_id', $nomination->id);
                 return $ranking ? $rankWeights[$ranking->rank - 1] ?? 0 : 0;
@@ -137,9 +137,17 @@ class VotingResultGraph extends Component
         });
 
         while ($nominations->count() > 1) {
-            $loser = $nominations->sortBy(function ($nomination) use ($currentVoteCount, $nominationWeightedScores) {
-                return [$currentVoteCount[$nomination->id] ?? 0, $nominationWeightedScores[$nomination->id]];
-            })->first();
+            $lowestVoteCount = min($currentVoteCount);
+            $potentialLosers = $nominations->filter(function ($nomination) use ($currentVoteCount, $lowestVoteCount) {
+                return $currentVoteCount[$nomination->id] === $lowestVoteCount;
+            });
+
+            if ($potentialLosers->count() === $nominations->count()) {
+                $potentialLosers = $potentialLosers->sortByDesc(function ($nomination) use ($nominationWeightedScores) {
+                    return $nominationWeightedScores[$nomination->id];
+                });
+            }
+            $loser = $potentialLosers->first();
 
             if ($loser === null) {
                 break;
