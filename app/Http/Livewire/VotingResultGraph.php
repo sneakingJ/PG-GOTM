@@ -117,6 +117,7 @@ class VotingResultGraph extends Component
     private function runRounds($nominations, $votes): array
     {
         $voteFlow = [];
+        $originalNominations = $nominations;
         $currentVoteCount = $this->getCurrentVoteCount($votes, $nominations);
 
         foreach ($nominations as $nomination) {
@@ -137,6 +138,7 @@ class VotingResultGraph extends Component
         });
 
         while ($nominations->count() > 1) {
+            $currentVoteCount = $this->getCurrentVoteCount($votes, $originalNominations);
             $lowestVoteCount = min($currentVoteCount);
             $potentialLosers = $nominations->filter(function ($nomination) use ($currentVoteCount, $lowestVoteCount) {
                 return $currentVoteCount[$nomination->id] === $lowestVoteCount;
@@ -186,10 +188,6 @@ class VotingResultGraph extends Component
                 }
             });
 
-            if ($eliminatedVotes->isNotEmpty()) {
-                $voteFlow["{$loser->game_name} ({$currentVoteCount[$loserKey]})"][] = ["Eliminated", $eliminatedVotes->count()];
-            }
-
             $nominations = $remainingNominations;
         }
 
@@ -197,13 +195,6 @@ class VotingResultGraph extends Component
         foreach ($voteFlow as $source => $data) {
             foreach ($data as $target) {
                 $results[] = [$source, $target[0], $target[1]];
-            }
-        }
-
-        // If $result is empty but voteFlow is not that means we have a tie
-        if (empty($results) && !empty($voteFlow)) {
-            foreach ($voteFlow as $source => $data) {
-                $results[] = [$source, 'Tie', 1];
             }
         }
 
