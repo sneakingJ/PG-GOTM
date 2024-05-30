@@ -107,22 +107,10 @@ class VotingResultGraph extends Component
 
     private function getNextRankedNomination($vote, $remainingNominations)
     {
-        $rankings = $vote->rankings->keyBy('rank');
-        while ($rankings->isNotEmpty()) {
-            $rankings->shift();
-            $rankings = $rankings->values()->map(function ($ranking, $index) {
-                $ranking->rank = $index + 1;
-                return $ranking;
-            });
-
-            if ($rankings->isNotEmpty()) {
-                $vote->rankings = $rankings;
-                $newTopChoice = $vote->rankings->first()->nomination_id;
-                $newTopChoiceNomination = $remainingNominations->find($newTopChoice);
-
-                if ($newTopChoiceNomination !== null) {
-                    return $newTopChoiceNomination;
-                }
+        foreach ($vote->rankings as $ranking) {
+            $nominationId = $ranking->nomination_id;
+            if ($remainingNominations->contains('id', $nominationId)) {
+                return $remainingNominations->firstWhere('id', $nominationId);
             }
         }
 
