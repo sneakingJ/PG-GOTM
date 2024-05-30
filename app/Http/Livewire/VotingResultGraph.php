@@ -161,15 +161,14 @@ class VotingResultGraph extends Component
             if ($loser === null) {
                 break;
             }
+
             $loserKey = $loser->id;
             $remainingNominations = $nominations->except($loserKey);
 
-            $transferredVotes = collect();
-            $eliminatedVotes = collect();
-
-            $votes->each(function ($vote) use ($loserKey, $remainingNominations, &$transferredVotes, &$eliminatedVotes) {
-                if ($vote->rankings->isEmpty() || $vote->rankings->first()->nomination_id != $loserKey) {
-                    return;
+            $transferredVotes = [];
+            foreach ($votes as $vote) {
+                if ($vote->rankings->count() > 0 && $vote->rankings->first()->nomination_id != $loserKey) {
+                    continue;
                 }
 
                 $newTopChoiceNomination = $this->getNextRankedNomination($vote, $remainingNominations);
