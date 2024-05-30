@@ -215,13 +215,6 @@ class VotingResultGraph extends Component
             ];
         }
 
-        // If $result is empty but voteFlow is not that means we have a tie
-        if (empty($results) && !empty($voteFlow)) {
-            foreach ($voteFlow as $source => $data) {
-                $results[] = [$source, 'Tie', 1];
-            }
-        }
-
         return $results;
     }
 
