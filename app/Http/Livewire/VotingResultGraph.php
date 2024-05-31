@@ -137,7 +137,7 @@ class VotingResultGraph extends Component
         $round = 1;
 
         foreach ($nominations as $nomination) {
-            $vertexId = $nomination->id . '_' . $round;
+            $vertexId = $nomination->game_name . '_' . $round;
             $vertex = $graph->createVertex($vertexId);
             $vertex->setAttribute('votes', $currentVoteCount[$nomination->id]);
         }
@@ -181,9 +181,10 @@ class VotingResultGraph extends Component
 
             foreach ($remainingNominations as $nomination) {
                 $winnerId = $nomination->id;
+                $winnerName = $nomination->game_name;
                 $votesTransferred = $transferredVotes[$winnerId] ?? 0;
 
-                $nextRoundVertexId = $winnerId . '_' . ($round + 1);
+                $nextRoundVertexId = $winnerName . '_' . ($round + 1);
                 if ($graph->hasVertex($nextRoundVertexId)) {
                     $nextRoundWinnerVertex = $graph->getVertex($nextRoundVertexId);
                 } else {
@@ -191,10 +192,10 @@ class VotingResultGraph extends Component
                 }
                 $nextRoundWinnerVertex->setAttribute('votes', $currentVoteCount[$winnerId] + $votesTransferred);
 
-                $loserVertex = $graph->getVertex($loser->id . '_' . $round);
+                $loserVertex = $graph->getVertex($loser->game_name . '_' . $round);
                 $loserVertex->createEdgeTo($nextRoundWinnerVertex)->setWeight($votesTransferred);
 
-                $currentRoundWinnerVertex = $graph->getVertex($winnerId . '_' . $round);
+                $currentRoundWinnerVertex = $graph->getVertex($winnerName . '_' . $round);
                 $currentRoundWinnerVertex->createEdgeTo($nextRoundWinnerVertex)->setWeight($currentVoteCount[$winnerId]);
             }
 
@@ -210,12 +211,10 @@ class VotingResultGraph extends Component
             $weight = $edge->getWeight();
 
             $sourceRoundNumber = explode('_', $source->getId())[1];
-            $sourceNominationId = explode('_', $source->getId())[0];
-            $sourceGameName = Nomination::find($sourceNominationId)->game_name;
+            $sourceGameName = explode('_', $source->getId())[0];
 
             $targetRoundNumber = explode('_', $target->getId())[1];
-            $targetNominationId = explode('_', $target->getId())[0];
-            $targetGameName = Nomination::find($targetNominationId)->game_name;
+            $targetGameName = explode('_', $target->getId())[0];
 
             $results[] = [
                 $sourceGameName . ' (' . $source->getAttribute('votes') . ")" . str_repeat(' ', $sourceRoundNumber),
