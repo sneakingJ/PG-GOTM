@@ -4,7 +4,10 @@ namespace App\Http\Livewire;
 
 use App\Models\Nomination;
 use App\Models\Vote;
+use Fhaculty\Graph\Edge\Directed;
 use Livewire\Component;
+use Fhaculty\Graph\Graph;
+use Fhaculty\Graph\Vertex;
 
 class VotingResultGraph extends Component
 {
@@ -127,15 +130,17 @@ class VotingResultGraph extends Component
 
     private function runRounds($nominations, $votes): array
     {
-        $voteFlow = [];
+        $graph = new Graph();
         $originalNominations = $nominations;
         $currentVoteCount = $this->getCurrentVoteCount($votes, $nominations);
 
-        foreach ($nominations as $nomination) {
-            $key = "{$nomination->game_name} ({$currentVoteCount[$nomination->id]})";
-            $voteFlow[$key] = [];
-        }
+        $round = 1;
 
+        foreach ($nominations as $nomination) {
+            $vertexId = $nomination->game_name . '_' . $round;
+            $vertex = $graph->createVertex($vertexId);
+            $vertex->setAttribute('votes', $currentVoteCount[$nomination->id]);
+        }
         $maxRank = $nominations->count();
         $rankWeights = array_reverse(range(1, $maxRank));
 
@@ -149,9 +154,7 @@ class VotingResultGraph extends Component
         });
 
         while ($nominations->count() > 1) {
-            $currentVoteCount = $this->getCurrentVoteCount($votes, $originalNominations);
 
-            // Sort all nominations by their vote count, then by their weighted score
             $potentialLosers = $nominations->sortByDesc(function ($nomination) use ($currentVoteCount, $nominationWeightedScores) {
                 return [$currentVoteCount[$nomination->id], $nominationWeightedScores[$nomination->id]];
             });
@@ -176,38 +179,52 @@ class VotingResultGraph extends Component
                 }
             }
 
-            foreach ($transferredVotes as $nominationId => $votesTransferred) {
-                $nomination = $remainingNominations->find($nominationId);
+            foreach ($remainingNominations as $nomination) {
+                $winnerId = $nomination->id;
+                $winnerName = $nomination->game_name;
+                $votesTransferred = $transferredVotes[$winnerId] ?? 0;
 
-                if ($nomination !== null) {
-                    $currentVoteCountForWinner = $currentVoteCount[$nominationId] ?? 0;
-                    $currentVoteCountForLoser = $currentVoteCount[$loserKey] ?? 0;
-
-                    $currentVoteCount[$nominationId] += $votesTransferred;
-                    $newVoteCountForWinner = $currentVoteCount[$nominationId];
-
-                    $winnerSourceKey = "{$nomination->game_name} ({$currentVoteCountForWinner})";
-                    $loserSourceKey = "{$loser->game_name} ({$currentVoteCountForLoser})";
-                    $targetKey = "{$nomination->game_name} ({$newVoteCountForWinner})";
-
-                    $voteFlow[$winnerSourceKey][] = [$targetKey, $currentVoteCountForWinner];
-                    $voteFlow[$loserSourceKey][] = [$targetKey, $votesTransferred];
+                $nextRoundVertexId = $winnerName . '_' . ($round + 1);
+                if ($graph->hasVertex($nextRoundVertexId)) {
+                    $nextRoundWinnerVertex = $graph->getVertex($nextRoundVertexId);
+                } else {
+                    $nextRoundWinnerVertex = $graph->createVertex($nextRoundVertexId);
                 }
+                $nextRoundWinnerVertex->setAttribute('votes', $currentVoteCount[$winnerId] + $votesTransferred);
+
+                $loserVertex = $graph->getVertex($loser->game_name . '_' . $round);
+                $loserVertex->createEdgeTo($nextRoundWinnerVertex)->setWeight($votesTransferred);
+
+                $currentRoundWinnerVertex = $graph->getVertex($winnerName . '_' . $round);
+                $currentRoundWinnerVertex->createEdgeTo($nextRoundWinnerVertex)->setWeight($currentVoteCount[$winnerId]);
             }
 
             $nominations = $remainingNominations;
+            $currentVoteCount = $this->getCurrentVoteCount($votes, $originalNominations);
+            $round++;
         }
 
         $results = [];
-        foreach ($voteFlow as $source => $data) {
-            foreach ($data as $target) {
-                $results[] = [$source, $target[0], $target[1]];
-            }
+        foreach ($graph->getEdges() as $edge) {
+            $source = $edge->getVertexStart();
+            $target = $edge->getVertexEnd();
+            $weight = $edge->getWeight();
+
+            $sourceRoundNumber = explode('_', $source->getId())[1];
+            $sourceGameName = explode('_', $source->getId())[0];
+
+            $targetRoundNumber = explode('_', $target->getId())[1];
+            $targetGameName = explode('_', $target->getId())[0];
+
+            $results[] = [
+                $sourceGameName . ' (' . $source->getAttribute('votes') . ")" . str_repeat(' ', $sourceRoundNumber),
+                $targetGameName . ' (' . $target->getAttribute('votes') . ")" . str_repeat(' ', $targetRoundNumber),
+                $weight
+            ];
         }
 
         return $results;
     }
-
 
     /**
      * @param array $results
