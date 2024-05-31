@@ -9,6 +9,7 @@
         "asantibanez/laravel-blade-sortable": "^1.3",
         "askancy/howlongtobeat": "dev-master",
         "fruitcake/laravel-cors": "^2.2",
+        "graphp/graph": "^0.9.3",
         "guzzlehttp/guzzle": "^7.8.1",
         "laravel/framework": "^8.83.27",
         "laravel/tinker": "^2.9",
