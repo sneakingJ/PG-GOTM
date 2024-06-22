@@ -33,9 +33,10 @@ class VoteStatus extends Component
      * @param bool $short
      * @return void
      */
-    public function mount($short)
+    public function mount($short, $voted)
     {
         $this->short = $short;
+        $this->voted = $voted;
     }
 
     /**

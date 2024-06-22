@@ -18,7 +18,7 @@
                             <h2 class="title is-3">Long Games</h2>
                         </div>
                         <div class="column is-narrow">
-                            @livewire('vote-status', ['short' => false])
+                            @livewire('vote-status', ['short' => false, 'voted' => $votedLong])
                         </div>
                     </div>
                     <div class="buttons hidden-button-wrapper">
@@ -91,7 +91,7 @@
                             <h2 class="title is-3">Short Games</h2>
                         </div>
                         <div class="column is-narrow">
-                            @livewire('vote-status', ['short' => true])
+                            @livewire('vote-status', ['short' => true, 'voted' => $votedShort])
                         </div>
                     </div>
                     <div class="buttons hidden-button-wrapper">
