@@ -80,7 +80,7 @@
 
 .sankey-container {
     overflow-x: scroll;
-    overflow-y: hidden;
+    overflow-y: scroll;
     white-space: nowrap;
     -ms-overflow-style: none;
     scrollbar-width: none;

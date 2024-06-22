@@ -135,6 +135,8 @@ class VotingList extends Component
         if ($this->saveOnDrop) {
             $this->saveVote($short);
         }
+
+        $this->emitTo('vote-status', 'updateVoteStatus', ['short' => $short]);
     }
 
     /**
@@ -165,7 +167,7 @@ class VotingList extends Component
             ]);
         }
 
-        $this->emitTo('vote-status', 'setVoted', true);
+        $this->emitTo('vote-status', 'updateVoteStatus', ['short' => $short]);
     }
 
     /**
@@ -174,14 +176,18 @@ class VotingList extends Component
      */
     public function deleteVote(bool $short): void
     {
-        $vote = Vote::where('month_id', $this->monthId)->where('discord_id', $this->userId)->where('short', $short)->first();
+        $vote = Vote::where('month_id', $this->monthId)
+            ->where('discord_id', $this->userId)
+            ->where('short', $short)
+            ->first();
 
         if (!empty($vote)) {
             Ranking::where('vote_id', $vote->id)->delete();
             $vote->delete();
-
-            $this->emitTo('vote-status', 'setVoted', false);
         }
+
+        $this->currentOrder[(int)$short] = [];
+        $this->emitTo('vote-status', 'updateVoteStatus', ['short' => $short]);
     }
 
     /**
