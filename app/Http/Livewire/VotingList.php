@@ -75,7 +75,37 @@ class VotingList extends Component
     }
 
     /**
-     * @param $short
+     * @return void
+     */
+    public function mount()
+    {
+        $this->initializeUserAndMonth();
+        $this->initializeVotingStatus();
+    }
+
+    /**
+     * @return void
+     */
+    private function initializeUserAndMonth()
+    {
+        $user = session('auth');
+        $this->userId = empty($user) ? '0' : $user['id'];
+        $this->monthId = Month::where('status', MonthStatus::VOTING)->first()->id ?? 0;
+    }
+
+    /**
+     * @return void
+     */
+    private function initializeVotingStatus()
+    {
+        $this->votedShort = $this->hasVotedGames(true);
+        $this->votedLong = $this->hasVotedGames(false);
+        $this->emitTo('vote-status', 'updateVoteStatus', ['short' => true, 'voted' => $this->votedShort]);
+        $this->emitTo('vote-status', 'updateVoteStatus', ['short' => false, 'voted' => $this->votedLong]);
+    }
+
+    /**
+     * @param bool $short
      * @return bool
      */
     public function hasVotedGames($short): bool
@@ -102,9 +132,6 @@ class VotingList extends Component
 
         $this->shortNominations = $this->fetchNominations(true);
         $this->longNominations = $this->fetchNominations(false);
-
-        $this->votedShort = $this->hasVotedGames(true);
-        $this->votedLong = $this->hasVotedGames(false);
 
         return view('livewire.voting-list');
     }
@@ -152,8 +179,7 @@ class VotingList extends Component
             $this->saveVote($short);
         }
 
-        $this->votedShort = $this->hasVotedGames(true);
-        $this->votedLong = $this->hasVotedGames(false);
+        $this->updateVotingStatus($short);
     }
 
     /**
@@ -184,10 +210,7 @@ class VotingList extends Component
             ]);
         }
 
-        $this->votedShort = $this->hasVotedGames(true);
-        $this->votedLong = $this->hasVotedGames(false);
-
-        $this->emitTo('vote-status', 'updateVoteStatus', ['short' => $short, 'voted' => $this->hasVotedGames($short)]);
+        $this->updateVotingStatus($short);
     }
 
     /**
@@ -207,11 +230,22 @@ class VotingList extends Component
         }
 
         $this->currentOrder[(int)$short] = [];
+        $this->updateVotingStatus($short);
+    }
 
-        $this->votedShort = $this->hasVotedGames(true);
-        $this->votedLong = $this->hasVotedGames(false);
-
-        $this->emitTo('vote-status', 'updateVoteStatus', ['short' => $short, 'voted' => false]);
+    /**
+     * @param bool $short
+     * @return void
+     */
+    private function updateVotingStatus($short)
+    {
+        $voted = $this->hasVotedGames($short);
+        if ($short) {
+            $this->votedShort = $voted;
+        } else {
+            $this->votedLong = $voted;
+        }
+        $this->emitTo('vote-status', 'updateVoteStatus', ['short' => $short, 'voted' => $voted]);
     }
 
     /**

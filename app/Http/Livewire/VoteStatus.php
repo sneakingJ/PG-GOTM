@@ -2,10 +2,6 @@
 
 namespace App\Http\Livewire;
 
-use App\Lib\MonthStatus;
-use App\Models\Month;
-use App\Models\Vote;
-use App\Models\Ranking;
 use Livewire\Component;
 
 /**
@@ -40,7 +36,6 @@ class VoteStatus extends Component
     public function mount($short)
     {
         $this->short = $short;
-        $this->updateVoteStatus(['short' => $this->short]);
     }
 
     /**
@@ -57,20 +52,8 @@ class VoteStatus extends Component
      */
     public function updateVoteStatus($params)
     {
-        if ($params['short'] !== $this->short) {
-            return;
+        if ($params['short'] === $this->short) {
+            $this->voted = $params['voted'];
         }
-
-        $user = session('auth');
-        $this->userId = empty($user) ? '0' : $user['id'];
-
-        $monthId = Month::where('status', MonthStatus::VOTING)->first()->id;
-
-        $vote = Vote::where('month_id', $monthId)
-            ->where('discord_id', $this->userId)
-            ->where('short', $this->short)
-            ->first();
-
-        $this->voted = $vote && Ranking::where('vote_id', $vote->id)->exists();
     }
 }
