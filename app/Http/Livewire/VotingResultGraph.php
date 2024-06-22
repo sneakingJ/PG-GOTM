@@ -4,8 +4,12 @@ namespace App\Http\Livewire;
 
 use App\Models\Nomination;
 use App\Models\Vote;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
 use Livewire\Component;
 use Fhaculty\Graph\Graph;
+
+use \Illuminate\Contracts\Foundation\Application;
 
 class VotingResultGraph extends Component
 {
@@ -30,9 +34,9 @@ class VotingResultGraph extends Component
     public array $results;
 
     /**
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+     * @return Application|Factory|View
      */
-    public function render(): \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\Foundation\Application
+    public function render(): View|Factory|Application
     {
         $this->categoryName = $this->short ? 'Short' : 'Long';
 
@@ -103,6 +107,11 @@ class VotingResultGraph extends Component
         return $voteCount;
     }
 
+    /**
+     * @param $vote
+     * @param $remainingNominations
+     * @return ?Nomination
+     */
     private function getNextRankedNomination($vote, $remainingNominations): ?Nomination
     {
         $rankings = $vote->rankings->keyBy('rank');
@@ -127,6 +136,11 @@ class VotingResultGraph extends Component
         return null;
     }
 
+    /**
+     * @param $nominations
+     * @param $votes
+     * @return array
+     */
     private function runRounds($nominations, $votes): array
     {
         $graph = new Graph();

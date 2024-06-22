@@ -4,6 +4,9 @@ namespace App\Http\Livewire;
 
 use App\Lib\MonthStatus;
 use App\Models\Month;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Collection;
 use Livewire\Component;
 use App\Models\Nomination;
@@ -105,7 +108,7 @@ class VotingList extends Component
      * @param bool $short
      * @return bool
      */
-    public function hasVotedGames($short): bool
+    public function hasVotedGames(bool $short): bool
     {
         $monthId = Month::where('status', MonthStatus::VOTING)->first()->id;
 
@@ -118,9 +121,9 @@ class VotingList extends Component
     }
 
     /**
-     * @return \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\Foundation\Application
+     * @return View|Factory|Application
      */
-    public function render(): \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\Foundation\Application
+    public function render(): View|Factory|Application
     {
         $this->shortNominations = $this->fetchNominations(true);
         $this->longNominations = $this->fetchNominations(false);
@@ -229,7 +232,7 @@ class VotingList extends Component
      * @param bool $short
      * @return void
      */
-    private function updateVotingStatus($short): void
+    private function updateVotingStatus(bool $short): void
     {
         $voted = $this->hasVotedGames($short);
         if ($short) {
@@ -241,7 +244,7 @@ class VotingList extends Component
     }
 
     /**
-     * @param bool $short
+     * @param array $order
      * @param int $shortKey
      * @return Collection
      */
