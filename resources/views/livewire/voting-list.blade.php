@@ -97,7 +97,7 @@
                     <div class="buttons hidden-button-wrapper">
                         @if ($votedShort)
                             <button class="button" type="button"
-                                wire:click="$emitTo('voting-list', 'deleteVote', false)">Unvote Short</button>
+                                wire:click="$emitTo('voting-list', 'deleteVote', true)">Unvote Short</button>
                         @endif
                     </div>
                 </div>
