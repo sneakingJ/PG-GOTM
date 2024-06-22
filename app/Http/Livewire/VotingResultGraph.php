@@ -4,10 +4,8 @@ namespace App\Http\Livewire;
 
 use App\Models\Nomination;
 use App\Models\Vote;
-use Fhaculty\Graph\Edge\Directed;
 use Livewire\Component;
 use Fhaculty\Graph\Graph;
-use Fhaculty\Graph\Vertex;
 
 class VotingResultGraph extends Component
 {
@@ -105,7 +103,7 @@ class VotingResultGraph extends Component
         return $voteCount;
     }
 
-    private function getNextRankedNomination($vote, $remainingNominations)
+    private function getNextRankedNomination($vote, $remainingNominations): ?Nomination
     {
         $rankings = $vote->rankings->keyBy('rank');
         while ($rankings->isNotEmpty()) {

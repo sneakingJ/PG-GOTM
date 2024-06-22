@@ -33,7 +33,7 @@ class VoteStatus extends Component
      * @param bool $short
      * @return void
      */
-    public function mount($short, $voted)
+    public function mount($short, $voted): void
     {
         $this->short = $short;
         $this->voted = $voted;
@@ -42,7 +42,7 @@ class VoteStatus extends Component
     /**
      * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
      */
-    public function render()
+    public function render(): \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
     {
         return view('components.vote-status');
     }
@@ -51,7 +51,7 @@ class VoteStatus extends Component
      * @param bool $status
      * @return void
      */
-    public function updateVoteStatus($params)
+    public function updateVoteStatus($params): void
     {
         if ($params['short'] === $this->short) {
             $this->voted = $params['voted'];

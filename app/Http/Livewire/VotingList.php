@@ -9,7 +9,6 @@ use Livewire\Component;
 use App\Models\Nomination;
 use App\Models\Vote;
 use App\Models\Ranking;
-use Illuminate\Support\Facades\Cookie;
 
 /**
  *
@@ -77,7 +76,7 @@ class VotingList extends Component
     /**
      * @return void
      */
-    public function mount()
+    public function mount(): void
     {
         $this->initializeUserAndMonth();
         $this->initializeVotingStatus();
@@ -86,7 +85,7 @@ class VotingList extends Component
     /**
      * @return void
      */
-    private function initializeUserAndMonth()
+    private function initializeUserAndMonth(): void
     {
         $user = session('auth');
         $this->userId = empty($user) ? '0' : $user['id'];
@@ -96,7 +95,7 @@ class VotingList extends Component
     /**
      * @return void
      */
-    private function initializeVotingStatus()
+    private function initializeVotingStatus(): void
     {
         $this->votedShort = $this->hasVotedGames(true);
         $this->votedLong = $this->hasVotedGames(false);
@@ -230,7 +229,7 @@ class VotingList extends Component
      * @param bool $short
      * @return void
      */
-    private function updateVotingStatus($short)
+    private function updateVotingStatus($short): void
     {
         $voted = $this->hasVotedGames($short);
         if ($short) {
