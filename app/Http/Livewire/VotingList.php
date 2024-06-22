@@ -4,12 +4,14 @@ namespace App\Http\Livewire;
 
 use App\Lib\MonthStatus;
 use App\Models\Month;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Collection;
 use Livewire\Component;
 use App\Models\Nomination;
 use App\Models\Vote;
 use App\Models\Ranking;
-use Illuminate\Support\Facades\Cookie;
 
 /**
  *
@@ -54,7 +56,7 @@ class VotingList extends Component
     /**
      * @var bool
      */
-    public bool $saveOnDrop = false;
+    public bool $saveOnDrop = true;
 
     /**
      * @var array
@@ -62,38 +64,71 @@ class VotingList extends Component
     public array $currentOrder = array();
 
     /**
+     * @var string
+     */
+    public string $divider = 'divider';
+
+    /**
      * @return void
      */
     public function boot(): void
     {
-        $this->saveOnDrop = Cookie::get('saveOnDrop') ?? false;
-    }
-
-    /**
-     * @return \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\Foundation\Application
-     */
-    public function render(): \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\Foundation\Application
-    {
-        $this->monthId = Month::where('status', MonthStatus::VOTING)->first()->id;
-
-        $user = session('auth');
-        $this->userId = empty($user) ? 0 : $user['id'];
-
-        $this->shortNominations = $this->fetchNominations(true);
-        $this->longNominations = $this->fetchNominations(false);
-
-        $this->votedShort = Vote::where('month_id', $this->monthId)->where('discord_id', $this->userId)->where('short', true)->exists();
-        $this->votedLong = Vote::where('month_id', $this->monthId)->where('discord_id', $this->userId)->where('short', false)->exists();
-
-        return view('livewire.voting-list');
+        $this->saveOnDrop = true;
     }
 
     /**
      * @return void
      */
-    public function updatingSaveOnDrop($value, $key): void
+    public function mount(): void
     {
-        Cookie::queue('saveOnDrop', $value, 525960);
+        $this->initializeUserAndMonth();
+        $this->initializeVotingStatus();
+    }
+
+    /**
+     * @return void
+     */
+    private function initializeUserAndMonth(): void
+    {
+        $user = session('auth');
+        $this->userId = empty($user) ? '0' : $user['id'];
+        $this->monthId = Month::where('status', MonthStatus::VOTING)->first()->id ?? 0;
+    }
+
+    /**
+     * @return void
+     */
+    private function initializeVotingStatus(): void
+    {
+        $this->votedShort = $this->hasVotedGames(true);
+        $this->votedLong = $this->hasVotedGames(false);
+    }
+
+    /**
+     * @param bool $short
+     * @return bool
+     */
+    public function hasVotedGames(bool $short): bool
+    {
+        $monthId = Month::where('status', MonthStatus::VOTING)->first()->id;
+
+        $vote = Vote::where('month_id', $monthId)
+            ->where('discord_id', $this->userId)
+            ->where('short', $short)
+            ->first();
+
+        return $vote && Ranking::where('vote_id', $vote->id)->exists();
+    }
+
+    /**
+     * @return View|Factory|Application
+     */
+    public function render(): View|Factory|Application
+    {
+        $this->shortNominations = $this->fetchNominations(true);
+        $this->longNominations = $this->fetchNominations(false);
+
+        return view('livewire.voting-list');
     }
 
     /**
@@ -115,6 +150,34 @@ class VotingList extends Component
     }
 
     /**
+     * Button to instantly shift game from ranked / unranked sides of the collection
+     */
+    public function moveNomination($nominationId, $short): void
+    {
+        $shortKey = (int)$short;
+        $currentOrder = $this->currentOrder[$shortKey];
+        $dividerIndex = array_search($this->divider, $currentOrder);
+
+        if (in_array($nominationId, array_slice($currentOrder, 0, $dividerIndex))) {
+            // Move to unranked
+            $rankedGames = array_diff(array_slice($currentOrder, 0, $dividerIndex), [$nominationId]);
+            $unrankedGames = array_merge([$nominationId], array_slice($currentOrder, $dividerIndex + 1));
+        } else {
+            // Move to ranked
+            $rankedGames = array_merge(array_slice($currentOrder, 0, $dividerIndex), [$nominationId]);
+            $unrankedGames = array_diff(array_slice($currentOrder, $dividerIndex + 1), [$nominationId]);
+        }
+
+        $this->currentOrder[$shortKey] = array_merge($rankedGames, [$this->divider], $unrankedGames);
+
+        if ($this->saveOnDrop) {
+            $this->saveVote($short);
+        }
+
+        $this->updateVotingStatus($short);
+    }
+
+    /**
      * @param bool $short
      * @return void
      */
@@ -131,6 +194,10 @@ class VotingList extends Component
         Ranking::where('vote_id', $vote->id)->delete();
 
         foreach ($this->currentOrder[$short] as $rank => $nominationId) {
+            if ($nominationId == $this->divider) {
+                break;
+            }
+
             Ranking::create([
                 'vote_id' => $vote->id,
                 'nomination_id' => $nominationId,
@@ -138,7 +205,7 @@ class VotingList extends Component
             ]);
         }
 
-        $this->emitTo('vote-status', 'setVoted', true);
+        $this->updateVotingStatus($short);
     }
 
     /**
@@ -147,18 +214,37 @@ class VotingList extends Component
      */
     public function deleteVote(bool $short): void
     {
-        $vote = Vote::where('month_id', $this->monthId)->where('discord_id', $this->userId)->where('short', $short)->first();
+        $vote = Vote::where('month_id', $this->monthId)
+            ->where('discord_id', $this->userId)
+            ->where('short', $short)
+            ->first();
 
         if (!empty($vote)) {
             Ranking::where('vote_id', $vote->id)->delete();
             $vote->delete();
-
-            $this->emitTo('vote-status', 'setVoted', false);
         }
+
+        $this->currentOrder[(int)$short] = [];
+        $this->updateVotingStatus($short);
     }
 
     /**
      * @param bool $short
+     * @return void
+     */
+    private function updateVotingStatus(bool $short): void
+    {
+        $voted = $this->hasVotedGames($short);
+        if ($short) {
+            $this->votedShort = $voted;
+        } else {
+            $this->votedLong = $voted;
+        }
+        $this->emitTo('vote-status', 'updateVoteStatus', ['short' => $short, 'voted' => $voted]);
+    }
+
+    /**
+     * @param array $order
      * @param int $shortKey
      * @return Collection
      */
@@ -184,6 +270,7 @@ class VotingList extends Component
             ->get();
 
         $this->currentOrder[$shortKey] = $nominations->pluck('id');
+        $this->currentOrder[$shortKey]->prepend($this->divider);
 
         return $nominations;
     }
@@ -210,10 +297,15 @@ class VotingList extends Component
             return $this->getRandomNominations($shortKey);
         }
 
-        $this->currentOrder[$shortKey] = $vote->rankings->sortBy('rank')->pluck('nomination_id')->toArray();
+        $rankedNominations = $vote->rankings->sortBy('rank')->pluck('nomination_id')->toArray();
+        $unrankedNominations = Nomination::where('month_id', $this->monthId)
+            ->where('short', $short)
+            ->whereNotIn('id', $rankedNominations)
+            ->inRandomOrder()
+            ->pluck('id')
+            ->toArray();
 
-        return $vote->rankings->sortBy('rank')->map(function ($ranking) {
-            return $ranking->nomination;
-        });
+        $this->currentOrder[$shortKey] = array_merge($rankedNominations, [$this->divider], $unrankedNominations);
+        return Nomination::findMany(array_merge($rankedNominations, $unrankedNominations));
     }
 }

@@ -4,10 +4,12 @@ namespace App\Http\Livewire;
 
 use App\Models\Nomination;
 use App\Models\Vote;
-use Fhaculty\Graph\Edge\Directed;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
 use Livewire\Component;
 use Fhaculty\Graph\Graph;
-use Fhaculty\Graph\Vertex;
+
+use \Illuminate\Contracts\Foundation\Application;
 
 class VotingResultGraph extends Component
 {
@@ -32,9 +34,9 @@ class VotingResultGraph extends Component
     public array $results;
 
     /**
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+     * @return Application|Factory|View
      */
-    public function render(): \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\Foundation\Application
+    public function render(): View|Factory|Application
     {
         $this->categoryName = $this->short ? 'Short' : 'Long';
 
@@ -86,6 +88,7 @@ class VotingResultGraph extends Component
     /**
      * Get the current vote count for each nomination where rank = 1
      * @param $votes
+     * @param $nominations
      * @return array
      */
     private function getCurrentVoteCount($votes, $nominations): array
@@ -104,7 +107,12 @@ class VotingResultGraph extends Component
         return $voteCount;
     }
 
-    private function getNextRankedNomination($vote, $remainingNominations)
+    /**
+     * @param $vote
+     * @param $remainingNominations
+     * @return ?Nomination
+     */
+    private function getNextRankedNomination($vote, $remainingNominations): ?Nomination
     {
         $rankings = $vote->rankings->keyBy('rank');
         while ($rankings->isNotEmpty()) {
@@ -128,6 +136,11 @@ class VotingResultGraph extends Component
         return null;
     }
 
+    /**
+     * @param $nominations
+     * @param $votes
+     * @return array
+     */
     private function runRounds($nominations, $votes): array
     {
         $graph = new Graph();
@@ -154,7 +167,6 @@ class VotingResultGraph extends Component
         });
 
         while ($nominations->count() > 1) {
-
             $potentialLosers = $nominations->sortByDesc(function ($nomination) use ($currentVoteCount, $nominationWeightedScores) {
                 return [$currentVoteCount[$nomination->id], $nominationWeightedScores[$nomination->id]];
             });
@@ -163,21 +175,24 @@ class VotingResultGraph extends Component
             if ($loser === null) {
                 break;
             }
-
             $loserKey = $loser->id;
             $remainingNominations = $nominations->except($loserKey);
 
-            $transferredVotes = [];
+            $transferredVotes = collect();
             foreach ($votes as $vote) {
-                if ($vote->rankings->count() > 0 && $vote->rankings->first()->nomination_id != $loserKey) {
+                if ($vote->rankings->isEmpty()) {
+                    continue;
+                }
+
+                if ($vote->rankings->first()->nomination_id != $loserKey) {
                     continue;
                 }
 
                 $newTopChoiceNomination = $this->getNextRankedNomination($vote, $remainingNominations);
                 if ($newTopChoiceNomination !== null) {
-                    $transferredVotes[$newTopChoiceNomination->id] = ($transferredVotes[$newTopChoiceNomination->id] ?? 0) + 1;
+                    $transferredVotes->put($newTopChoiceNomination->id, $transferredVotes->get($newTopChoiceNomination->id, 0) + 1);
                 }
-            }
+            };
 
             foreach ($remainingNominations as $nomination) {
                 $winnerId = $nomination->id;
