@@ -100,8 +100,6 @@ class VotingList extends Component
     {
         $this->votedShort = $this->hasVotedGames(true);
         $this->votedLong = $this->hasVotedGames(false);
-        $this->emitTo('vote-status', 'updateVoteStatus', ['short' => true, 'voted' => $this->votedShort]);
-        $this->emitTo('vote-status', 'updateVoteStatus', ['short' => false, 'voted' => $this->votedLong]);
     }
 
     /**
@@ -125,11 +123,6 @@ class VotingList extends Component
      */
     public function render(): \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\Foundation\Application
     {
-        $this->monthId = Month::where('status', MonthStatus::VOTING)->first()->id;
-
-        $user = session('auth');
-        $this->userId = empty($user) ? 0 : $user['id'];
-
         $this->shortNominations = $this->fetchNominations(true);
         $this->longNominations = $this->fetchNominations(false);
 
