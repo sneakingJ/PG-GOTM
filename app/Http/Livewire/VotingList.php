@@ -299,6 +299,7 @@ class VotingList extends Component
 
         $rankedNominations = $vote->rankings->sortBy('rank')->pluck('nomination_id')->toArray();
         $unrankedNominations = Nomination::where('month_id', $this->monthId)
+            ->where('jury_selected', true)
             ->where('short', $short)
             ->whereNotIn('id', $rankedNominations)
             ->inRandomOrder()
