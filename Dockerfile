@@ -1,33 +1,47 @@
-FROM composer:latest as build
+FROM ghcr.io/serversideup/php:8.1-cli-alpine AS base
 
-COPY . /usr/src/app
-WORKDIR /usr/src/app
+USER root
 
-RUN composer install --no-dev --optimize-autoloader
+RUN set -eux && install-php-extensions intl
 
-FROM php:8.1-fpm-buster
+USER www-data
 
-RUN apt-get update && apt-get install -y \
-    libfreetype6-dev \
-    libjpeg62-turbo-dev \
-    libpng-dev \
-    libonig-dev \
-    libzip-dev \
-    zip \
-    unzip \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install -j$(nproc) iconv mbstring gd pdo pdo_mysql zip
+CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8080"]
 
-COPY --from=build /usr/src/app /var/www/html
+##############################################################################
 
-RUN php ./artisan key:generate && \
-    php ./artisan view:cache && \
-    php ./artisan route:cache && \
-    php ./artisan config:cache && \
-    php ./artisan storage:link
+FROM base AS development
 
-WORKDIR /var/www/html
+ARG WWWUSER
+ARG WWWGROUP
 
-EXPOSE 9000
+USER root
 
-CMD ["php-fpm"]
+RUN usermod -ou $WWWUSER www-data \
+    && groupmod -og $WWWGROUP www-data \
+    && useradd -mNo -g www-data -u $(id -u www-data) sail
+
+USER www-data
+
+##############################################################################
+
+FROM node:18-alpine AS assets
+
+WORKDIR /app
+
+COPY --chown=www-data:www-data . /app
+
+RUN npm run prod
+
+##############################################################################
+
+FROM base AS production
+
+# Again, this is not to mess with permissions
+COPY --chown=www-data:www-data . /var/www/html
+
+RUN composer install --optimize-autoloader --no-dev
+
+RUN sed -i 's/protected \$proxies/protected \$proxies = "*"/g' app/Http/Middleware/TrustProxies.php
+
+COPY --from=assets /app/public /var/www/html/public
