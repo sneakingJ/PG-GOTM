@@ -37,7 +37,7 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: |
-            ghcr.io/sneakingJ/pg-gotm:${{ github.sha }}
-            ghcr.io/sneakingJ/pg-gotm:latest
+            ghcr.io/sneakingj/pg-gotm:${{ github.sha }}
+            ghcr.io/sneakingj/pg-gotm:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
