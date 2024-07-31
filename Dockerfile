@@ -1,12 +1,10 @@
-FROM ghcr.io/serversideup/php:8.1-cli-alpine AS base
+FROM ghcr.io/serversideup/php:8.1-fpm-nginx-alpine AS base
 
 USER root
 
 RUN set -eux && install-php-extensions intl
 
 USER www-data
-
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8080"]
 
 ##############################################################################
 
