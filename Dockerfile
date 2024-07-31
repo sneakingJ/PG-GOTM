@@ -42,6 +42,4 @@ COPY --chown=www-data:www-data . /var/www/html
 
 RUN composer install --optimize-autoloader --no-dev
 
-RUN sed -i 's/protected \$proxies/protected \$proxies = "*"/g' app/Http/Middleware/TrustProxies.php
-
 COPY --from=assets /app/public /var/www/html/public
