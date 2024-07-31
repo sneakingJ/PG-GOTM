@@ -31,7 +31,7 @@ WORKDIR /app
 
 COPY --chown=www-data:www-data . /app
 
-RUN npm run prod
+RUN npm ci && npm run prod
 
 ##############################################################################
 
