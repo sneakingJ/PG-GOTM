@@ -30,5 +30,3 @@ services:
 volumes:
     sailmysql:
         driver: local
-    sail-mysql:
-        driver: local
