@@ -84,6 +84,8 @@
     white-space: nowrap;
     -ms-overflow-style: none;
     scrollbar-width: none;
+    height: 600px;
+    width: 100%;
 }
 
 .sankey-container::-webkit-scrollbar {
