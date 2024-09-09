@@ -234,7 +234,7 @@ class VotingResultGraph extends Component
             $results[] = [
                 $sourceGameName . ' (' . $source->getAttribute('votes') . ")" . str_repeat(' ', $sourceRoundNumber),
                 $targetGameName . ' (' . $target->getAttribute('votes') . ")" . str_repeat(' ', $targetRoundNumber),
-                $weight
+                strval($weight)
             ];
         }
 

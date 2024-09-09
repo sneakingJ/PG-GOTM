@@ -1,0 +1,1 @@
+Call `wasm-pack build --target web` in root to create pkg folder
