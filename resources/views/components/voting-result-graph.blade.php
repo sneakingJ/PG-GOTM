@@ -1,4 +1,4 @@
-<div class="box">
+<div class="box sankey-box">
     <h2 class="title is-3">{{ $categoryName }} Games</h2>
     <div id="{{ $categoryName }}-sankey" class="sankey-container">
         <canvas id="{{ $categoryName }}-canvas"></canvas>

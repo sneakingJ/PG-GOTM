@@ -78,14 +78,17 @@
     cursor: pointer;
 }
 
+.sankey-box {
+    overflow-x: auto;
+    overflow-y: auto;
+}
 .sankey-container {
-    overflow-x: scroll;
-    overflow-y: scroll;
     white-space: nowrap;
     -ms-overflow-style: none;
     scrollbar-width: none;
     height: 600px;
     width: 100%;
+    min-width: 800px;
 }
 
 .sankey-container::-webkit-scrollbar {
