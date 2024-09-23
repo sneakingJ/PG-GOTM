@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
     <link rel="stylesheet" href="https://unpkg.com/bulmaswatch/darkly/bulmaswatch.min.css">
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script defer src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js"></script>
     <x-laravel-blade-sortable::scripts/>
     <script type="text/javascript" src="{{ asset('js/app.js') }}"></script>
