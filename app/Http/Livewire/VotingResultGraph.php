@@ -50,8 +50,7 @@ class VotingResultGraph extends Component
      */
     public function poll(): void
     {
-        $results = $this->fetchVotingResults();
-        $this->results = $this->prepareChartData($results);
+        $this->results = $this->fetchVotingResults();
 
         $this->dispatchBrowserEvent('polled');
     }
@@ -239,16 +238,5 @@ class VotingResultGraph extends Component
         }
 
         return $results;
-    }
-
-    /**
-     * @param array $results
-     * @return array
-     */
-    private function prepareChartData(array $results): array
-    {
-        return array_map(function ($result) {
-            return [addslashes($result[0]), addslashes($result[1]), $result[2]];
-        }, $results);
     }
 }
