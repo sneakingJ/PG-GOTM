@@ -2,12 +2,14 @@
     "name": "laravel/laravel",
     "type": "project",
     "description": "The Laravel Framework.",
-    "keywords": ["framework", "laravel"],
+    "keywords": [
+        "framework",
+        "laravel"
+    ],
     "license": "MIT",
     "require": {
         "php": "^8.1",
         "asantibanez/laravel-blade-sortable": "^1.3",
-        "askancy/howlongtobeat": "dev-master",
         "fruitcake/laravel-cors": "^2.2",
         "graphp/graph": "^0.9.3",
         "guzzlehttp/guzzle": "^7.8.1",
@@ -15,6 +17,7 @@
         "laravel/tinker": "^2.9",
         "livewire/livewire": "^2.12.6",
         "marcreichel/igdb-laravel": "^3.8.1",
+        "obviyus/howlongtobeat-php": "master",
         "socialiteproviders/discord": "^4.2"
     },
     "require-dev": {
@@ -63,6 +66,12 @@
         "preferred-install": "dist",
         "sort-packages": true
     },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/obviyus/howlongtobeat-php"
+        }
+    ],
     "minimum-stability": "dev",
     "prefer-stable": true
 }
