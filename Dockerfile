@@ -1,4 +1,4 @@
-FROM ghcr.io/serversideup/php:8.1-fpm-nginx-alpine AS base
+FROM ghcr.io/serversideup/php:8.2-fpm-nginx-alpine AS base
 
 USER root
 
